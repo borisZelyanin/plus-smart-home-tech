@@ -1,0 +1,8 @@
+         (  )
+        (   )
+         | |
+        _|_|_         COLLECTOR SERVICE
+     __|     |__      Smart Home / Kafka / Avro
+    |  O     O  |
+    |    💡     |      Version: 1.0
+     \_______/        Powered by Spring Boot

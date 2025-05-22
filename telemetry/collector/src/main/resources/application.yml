@@ -1,0 +1,33 @@
+server:
+  port: 8080
+
+spring:
+  profiles:
+    active: main-service
+
+  kafka:
+    bootstrap-servers: localhost:9092
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: ru.practicum.collector.kafka.GeneralKafkaSerializer
+
+    consumer:
+      group-id: collector-sensor-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: ru.practicum.collector.kafka.GeneralKafkaDeserializer
+      properties:
+        avro.deserializer.target.class: ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro
+
+logging:
+  level:
+    org:
+      apache:
+        kafka: INFO
+      springframework:
+        kafka: DEBUG
+        web: DEBUG
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
