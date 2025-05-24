@@ -27,14 +27,19 @@ logging:
       springframework:
         kafka: DEBUG
         web: DEBUG
+      io:
+        grpc: DEBUG
 
 grpc:
+  server:
+    port: 59091
+
   client:
     echo:
       address: 'static://127.0.0.1:59091'
       enableKeepAlive: true
       keepAliveWithoutCalls: true
-      negotiationType: plaintext
+      negotiationType: TLS
 
 springdoc:
   api-docs:
