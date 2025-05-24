@@ -25,6 +25,8 @@ import java.time.Instant;
         SwitchSensorEvent.class,
         TemperatureSensorEvent.class
 })
+@NoArgsConstructor
+@AllArgsConstructor
 public abstract class SensorEvent {
     @Schema(description = "Идентификатор сенсора", example = "sensor.light.3")
     @NotBlank
