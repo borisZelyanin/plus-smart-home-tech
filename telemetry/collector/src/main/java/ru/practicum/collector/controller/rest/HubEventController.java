@@ -1,4 +1,4 @@
-package ru.practicum.collector.controller;
+package ru.practicum.collector.controller.rest;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
