@@ -3,10 +3,7 @@ package ru.practicum.analyzer.logic;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.practicum.analyzer.model.Action;
-import ru.practicum.analyzer.model.Condition;
-import ru.practicum.analyzer.model.Scenario;
-import ru.practicum.analyzer.model.ScenarioAction;
+import ru.practicum.analyzer.model.*;
 import ru.practicum.analyzer.repository.ScenarioRepository;
 import ru.practicum.analyzer.service.GrpcHubClient;
 import ru.yandex.practicum.kafka.telemetry.event.*;
@@ -34,26 +31,29 @@ public class ScenarioEvaluator {
 
         List<Scenario> scenarios = scenarioRepository.findByHubId(hubId);
         if (scenarios.isEmpty()) {
-            log.info("📭 Нет сценариев для анализа для хаба: {}", hubId);
+            log.info("📭 Нет сценариев для хаба: {}", hubId);
             return;
         }
-        log.info("🔎 Найдено сценариев для анализа: {}", scenarios.size());
+
+        log.info("🔎 Анализ сценариев: найдено {} для хаба {}", scenarios.size(), hubId);
 
         for (Scenario scenario : scenarios) {
-            boolean allConditionsMet = scenario.getConditions().stream().allMatch(scenarioCondition -> {
-                String sensorId = scenarioCondition.getSensor().getId();
+            log.debug("🧪 Проверка сценария: '{}'", scenario.getName());
+
+            boolean allConditionsMet = scenario.getConditions().stream().allMatch(condition -> {
+                String sensorId = condition.getSensor().getId();
                 SensorStateAvro state = sensorsState.get(sensorId);
-                log.debug("🔍 Проверка условия для сенсора: {}", sensorId);
-                return evaluateCondition(scenarioCondition.getCondition(), state);
+                log.debug("🔍 Условие по сенсору: {}", sensorId);
+                return evaluateCondition(condition.getCondition(), state);
             });
 
             if (allConditionsMet) {
-                log.info("✅ Условия выполнены для сценария: {}", scenario.getName());
+                log.info("✅ Все условия выполнены: сценарий '{}'", scenario.getName());
                 for (ScenarioAction scenarioAction : scenario.getActions()) {
                     hubClient.sendAction(hubId, scenario.getName(), scenarioAction.getAction(), timestamp);
                 }
             } else {
-                log.debug("⛔ Сценарий не выполнен: {}", scenario.getName());
+                log.debug("⛔ Условия не выполнены: сценарий '{}'", scenario.getName());
             }
         }
     }
@@ -64,9 +64,8 @@ public class ScenarioEvaluator {
 
         Integer actualValue;
         try {
-            ConditionType conditionType = ConditionType.valueOf(condition.getType().name());
-
-            switch (conditionType) {
+            ConditionType type = ConditionType.valueOf(condition.getType().name());
+            switch (type) {
                 case TEMPERATURE -> {
                     var temp = extractSensorData(state, TemperatureSensorAvro.class);
                     actualValue = temp != null ? temp.getTemperatureC() : null;
@@ -92,13 +91,13 @@ public class ScenarioEvaluator {
                     actualValue = sw != null ? (sw.getState() ? 1 : 0) : null;
                 }
                 default -> {
-                    log.warn("⚠ Необработанный тип условия: {}", condition.getType());
+                    log.warn("⚠ Необработанный тип условия: {}", type);
                     return false;
                 }
             }
 
             if (actualValue == null) {
-                log.warn("⚠ Значение сенсора не определено для условия: {}", condition);
+                log.warn("⚠ Не получено значение сенсора для условия: {}", condition);
                 return false;
             }
 
@@ -120,23 +119,16 @@ public class ScenarioEvaluator {
             }
         };
     }
+
     @SuppressWarnings("unchecked")
     private <T> T extractSensorData(SensorStateAvro state, Class<T> expectedClass) {
         Object payload = state.getData();
         if (expectedClass.isInstance(payload)) {
             return (T) payload;
         } else {
-            log.warn("⚠ Ожидался тип {}, но получен {}", expectedClass.getSimpleName(), payload.getClass().getSimpleName());
+            log.warn("⚠ Тип данных не совпадает: ожидался {}, получен {}",
+                    expectedClass.getSimpleName(), payload.getClass().getSimpleName());
             return null;
         }
-    }
-
-    private enum ConditionType {
-        TEMPERATURE,
-        LUMINOSITY,
-        CO2LEVEL,
-        HUMIDITY,
-        MOTION,
-        SWITCH
     }
 }
