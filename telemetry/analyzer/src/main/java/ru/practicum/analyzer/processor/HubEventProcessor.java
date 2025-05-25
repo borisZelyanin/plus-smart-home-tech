@@ -51,6 +51,7 @@ public class HubEventProcessor implements Runnable {
 
                 for (ConsumerRecord<String, HubEventAvro> record : records) {
                     HubEventAvro event = record.value();
+                    log.debug("📦 Получен event: {}", record);
                     log.debug("🔍 Обработка события от хаба '{}': ключ='{}', offset={}, partition={}",
                             event.getHubId(), record.key(), record.offset(), record.partition());
                     handleEvent(event);
