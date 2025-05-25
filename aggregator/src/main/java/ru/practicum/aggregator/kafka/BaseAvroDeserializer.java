@@ -1,4 +1,4 @@
-package ru.practicum.aggregator.serialization;
+package ru.practicum.aggregator.kafka;
 
 import org.apache.avro.Schema;
 import org.apache.avro.io.DecoderFactory;
