@@ -80,13 +80,19 @@ public class HubEventProcessor implements Runnable {
         Object payload = event.getPayload();
         String hubId = event.getHubId();
 
+        log.info("📨 Получено событие от хаба: {}, тип payload: {}", hubId, payload.getClass().getSimpleName());
+
         if (payload instanceof DeviceAddedEventAvro deviceAdded) {
+            log.debug("🔧 Обработка события добавления устройства: {}", deviceAdded);
             handleDeviceAdded(hubId, deviceAdded);
         } else if (payload instanceof DeviceRemovedEventAvro deviceRemoved) {
+            log.debug("🔧 Обработка события удаления устройства: {}", deviceRemoved);
             handleDeviceRemoved(hubId, deviceRemoved);
         } else if (payload instanceof ScenarioAddedEventAvro scenarioAdded) {
+            log.debug("🔧 Обработка события добавления/обновления сценария: {}", scenarioAdded);
             handleScenarioAdded(hubId, scenarioAdded);
         } else if (payload instanceof ScenarioRemovedEventAvro scenarioRemoved) {
+            log.debug("🔧 Обработка события удаления сценария: {}", scenarioRemoved);
             handleScenarioRemoved(hubId, scenarioRemoved);
         } else {
             log.warn("⚠ Неизвестный тип события: {}", payload.getClass().getSimpleName());
@@ -113,6 +119,8 @@ public class HubEventProcessor implements Runnable {
     }
 
     private void handleScenarioAdded(String hubId, ScenarioAddedEventAvro event) {
+        log.info("📥 Получен сценарий от хаба '{}': {}", hubId, event.getName());
+
         Optional<Scenario> existing = scenarioRepository.findByHubIdAndName(hubId, event.getName());
 
         Scenario scenario = existing.orElseGet(() -> {
@@ -122,7 +130,6 @@ public class HubEventProcessor implements Runnable {
             return s;
         });
 
-        // Удаляем старые действия и условия, если обновляем сценарий
         if (existing.isPresent()) {
             conditionRepository.deleteByScenario(scenario);
             actionRepository.deleteByScenario(scenario);
@@ -136,9 +143,10 @@ public class HubEventProcessor implements Runnable {
         // Условия
         List<Condition> conditions = event.getConditions().stream()
                 .map(proto -> {
-                    Sensor sensor = sensorRepository.findByIdAndHubId(proto.getSensorId(), hubId).orElse(null);
+                    String sensorId = proto.getSensorId();
+                    Sensor sensor = sensorRepository.findByIdAndHubId(sensorId, hubId).orElse(null);
                     if (sensor == null) {
-                        log.warn("⚠ Не найден датчик '{}' для условия", proto.getSensorId());
+                        log.warn("⚠ Не найден датчик '{}' для условия", sensorId);
                         return null;
                     }
                     Condition condition = new Condition();
@@ -146,6 +154,7 @@ public class HubEventProcessor implements Runnable {
                     condition.setScenario(scenario);
                     condition.setType(ConditionType.valueOf(proto.getType().name()));
                     condition.setOperation(ConditionOperation.valueOf(proto.getOperation().name()));
+
                     Object rawValue = proto.getValue();
                     Integer value = null;
 
@@ -158,18 +167,24 @@ public class HubEventProcessor implements Runnable {
                     }
 
                     condition.setValue(value != null ? value : 0);
+
+                    log.debug("✅ Условие добавлено: sensorId={}, type={}, op={}, value={}",
+                            sensorId, proto.getType(), proto.getOperation(), condition.getValue());
+
                     return condition;
                 })
                 .filter(Objects::nonNull)
                 .toList();
         conditionRepository.saveAll(conditions);
+        log.info("✅ Сохранено {} условий", conditions.size());
 
         // Действия
         List<Action> actions = event.getActions().stream()
                 .map(proto -> {
-                    Sensor sensor = sensorRepository.findByIdAndHubId(proto.getSensorId(), hubId).orElse(null);
+                    String sensorId = proto.getSensorId();
+                    Sensor sensor = sensorRepository.findByIdAndHubId(sensorId, hubId).orElse(null);
                     if (sensor == null) {
-                        log.warn("⚠ Не найден датчик '{}' для действия", proto.getSensorId());
+                        log.warn("⚠ Не найден датчик '{}' для действия", sensorId);
                         return null;
                     }
                     Action action = new Action();
@@ -177,19 +192,32 @@ public class HubEventProcessor implements Runnable {
                     action.setScenario(scenario);
                     action.setType(ActionType.valueOf(proto.getType().name()));
                     action.setValue(proto.getValue());
+
+                    log.debug("✅ Действие добавлено: sensorId={}, type={}, value={}",
+                            sensorId, proto.getType(), proto.getValue());
+
                     return action;
                 })
                 .filter(Objects::nonNull)
                 .toList();
         actionRepository.saveAll(actions);
+        log.info("✅ Сохранено {} действий", actions.size());
     }
 
     private void handleScenarioRemoved(String hubId, ScenarioRemovedEventAvro event) {
-        scenarioRepository.findByHubIdAndName(hubId, event.getName()).ifPresent(scenario -> {
+        String scenarioName = event.getName();
+        log.info("📥 Получен запрос на удаление сценария '{}' от хаба '{}'", scenarioName, hubId);
+
+        scenarioRepository.findByHubIdAndName(hubId, scenarioName).ifPresentOrElse(scenario -> {
+            log.debug("🔍 Найден сценарий: id={}, name={}, hubId={}", scenario.getId(), scenario.getName(), scenario.getHubId());
+
             conditionRepository.deleteByScenario(scenario);
             actionRepository.deleteByScenario(scenario);
             scenarioRepository.delete(scenario);
-            log.info("🗑 Удалён сценарий: {}", scenario.getName());
+
+            log.info("🗑 Удалён сценарий: '{}'", scenario.getName());
+        }, () -> {
+            log.warn("⚠ Сценарий '{}' для хаба '{}' не найден. Удаление пропущено.", scenarioName, hubId);
         });
     }
 }
