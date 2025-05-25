@@ -31,7 +31,7 @@ public class SnapshotProcessor {
 
         try {
             while (true) {
-                ConsumerRecords<String, SensorsSnapshotAvro> records = consumer.poll(Duration.ofMillis(100));
+                ConsumerRecords<String, SensorsSnapshotAvro> records = consumer.poll(Duration.ofMillis(2000));
 
                 for (ConsumerRecord<String, SensorsSnapshotAvro> record : records) {
                     SensorsSnapshotAvro snapshot = record.value();

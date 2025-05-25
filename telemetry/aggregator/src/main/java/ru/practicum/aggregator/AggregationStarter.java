@@ -32,7 +32,7 @@ public class AggregationStarter {
 
         try {
             while (true) {
-                var records = consumer.poll(Duration.ofMillis(100));
+                var records = consumer.poll(Duration.ofMillis(2000));
 
                 for (var record : records) {
                     var event = record.value();
