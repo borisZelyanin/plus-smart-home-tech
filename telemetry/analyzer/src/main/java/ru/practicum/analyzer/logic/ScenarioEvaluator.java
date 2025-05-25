@@ -6,14 +6,15 @@ import org.springframework.stereotype.Service;
 import ru.practicum.analyzer.model.Action;
 import ru.practicum.analyzer.model.Condition;
 import ru.practicum.analyzer.model.Scenario;
+import ru.practicum.analyzer.model.ScenarioAction;
 import ru.practicum.analyzer.repository.ScenarioRepository;
 import ru.practicum.analyzer.service.GrpcHubClient;
-import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
-import ru.yandex.practicum.kafka.telemetry.event.SensorStateAvro;
+import ru.yandex.practicum.kafka.telemetry.event.*;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -29,17 +30,28 @@ public class ScenarioEvaluator {
         Map<String, SensorStateAvro> sensorsState = snapshot.getSensorsState();
 
         List<Scenario> scenarios = scenarioRepository.findByHubId(hubId);
+        if (scenarios.isEmpty()) {
+            log.info("📭 Нет сценариев для анализа для хаба: {}", hubId);
+            return;
+        }
         log.info("🔎 Найдено сценариев для анализа: {}", scenarios.size());
 
         for (Scenario scenario : scenarios) {
-            boolean allConditionsMet = scenario.getConditions().stream().allMatch(condition ->
-                    evaluateCondition(condition, sensorsState.get(condition.getSensorId()))
-            );
+            boolean allConditionsMet = scenario.getConditions().stream().allMatch(scenarioCondition -> {
+                String sensorId = scenarioCondition.getSensor().getId(); // так если у ScenarioCondition есть getSensor()
+                SensorStateAvro state = sensorsState.get(sensorId);
+                return evaluateCondition(scenarioCondition.getCondition(), state); // достаём Condition
+            });
 
             if (allConditionsMet) {
                 log.info("✅ Условия выполнены для сценария: {}", scenario.getName());
-                for (Action action : scenario.getActions()) {
-                    hubClient.sendAction(hubId, scenario.getName(), action, timestamp);
+                for (ScenarioAction scenarioAction : scenario.getActions()) {
+                    hubClient.sendAction(
+                            hubId,
+                            scenario.getName(),
+                            scenarioAction.getAction(), // достаём Action
+                            timestamp
+                    );
                 }
             } else {
                 log.debug("⛔ Сценарий не выполнен: {}", scenario.getName());
@@ -48,37 +60,80 @@ public class ScenarioEvaluator {
     }
 
     private boolean evaluateCondition(Condition condition, SensorStateAvro state) {
-        if (state == null) {
-            return false;
-        }
+        if (state == null) return false;
 
-        int actualValue;
+        Objects.requireNonNull(condition.getValue(), "Condition value must not be null");
+
+        Integer actualValue;
         try {
-            actualValue = switch (condition.getType()) {
-                case "TEMPERATURE" -> state.getData().getTemperatureSensor().getValue();
-                case "LUMINOSITY" -> state.getData().getLightSensor().getValue();
-                case "CO2LEVEL" -> state.getData().getClimateSensor().getCo2();
-                case "HUMIDITY" -> state.getData().getClimateSensor().getHumidity();
-                case "MOTION" -> state.getData().getMotionSensor().getDetected() ? 1 : 0;
-                case "SWITCH" -> state.getData().getSwitchSensor().getState() ? 1 : 0;
-                default -> {
-                    log.warn("⚠ Неизвестный тип условия: {}", condition.getType());
-                    yield Integer.MIN_VALUE;
+            ConditionType conditionType = ConditionType.valueOf(condition.getType());
+
+            switch (conditionType) {
+                case TEMPERATURE -> {
+                    var temp = extractSensorData(state, TemperatureSensorAvro.class);
+                    actualValue = temp != null ? temp.getTemperatureC() : null;
                 }
-            };
+                case LUMINOSITY -> {
+                    var light = extractSensorData(state, LightSensorAvro.class);
+                    actualValue = light != null ? light.getLuminosity() : null;
+                }
+                case CO2LEVEL -> {
+                    var climate = extractSensorData(state, ClimateSensorAvro.class);
+                    actualValue = climate != null ? climate.getCo2Level() : null;
+                }
+                case HUMIDITY -> {
+                    var climate = extractSensorData(state, ClimateSensorAvro.class);
+                    actualValue = climate != null ? climate.getHumidity() : null;
+                }
+                case MOTION -> {
+                    var motion = extractSensorData(state, MotionSensorAvro.class);
+                    actualValue = motion != null ? (motion.getMotion() ? 1 : 0) : null;
+                }
+                case SWITCH -> {
+                    var sw = extractSensorData(state, SwitchSensorAvro.class);
+                    actualValue = sw != null ? (sw.getState() ? 1 : 0) : null;
+                }
+                default -> {
+                    log.warn("⚠ Необработанный тип условия: {}", condition.getType());
+                    return false;
+                }
+            }
+
+            if (actualValue == null) return false;
+
         } catch (Exception e) {
-            log.warn("⚠ Ошибка при чтении значения датчика", e);
+            log.warn("⚠ Ошибка при обработке условия", e);
             return false;
         }
 
         return switch (condition.getOperation()) {
-            case "EQUALS" -> actualValue == condition.getValue();
+            case "EQUALS" -> actualValue.equals(condition.getValue());
             case "GREATER_THAN" -> actualValue > condition.getValue();
             case "LOWER_THAN" -> actualValue < condition.getValue();
             default -> {
-                log.warn("⚠ Неизвестная операция условия: {}", condition.getOperation());
+                log.warn("⚠ Неизвестная операция: {}", condition.getOperation());
                 yield false;
             }
         };
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T extractSensorData(SensorStateAvro state, Class<T> expectedClass) {
+        Object payload = state.getData();
+        if (expectedClass.isInstance(payload)) {
+            return (T) payload;
+        } else {
+            log.warn("⚠ Ожидался тип {}, но получен {}", expectedClass.getSimpleName(), payload.getClass().getSimpleName());
+            return null;
+        }
+    }
+
+    private enum ConditionType {
+        TEMPERATURE,
+        LUMINOSITY,
+        CO2LEVEL,
+        HUMIDITY,
+        MOTION,
+        SWITCH
     }
 }

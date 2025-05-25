@@ -7,6 +7,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.common.errors.WakeupException;
 import org.springframework.stereotype.Component;
+import ru.practicum.analyzer.config.AnalyzerProperties;
 import ru.practicum.analyzer.logic.ScenarioEvaluator;
 import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
 
@@ -20,12 +21,13 @@ public class SnapshotProcessor {
 
     private final Consumer<String, SensorsSnapshotAvro> consumer;
     private final ScenarioEvaluator scenarioEvaluator;
+    private final AnalyzerProperties props;
 
-    private static final String SNAPSHOTS_TOPIC = "telemetry.snapshots.v1";
+//    private static final String SNAPSHOTS_TOPIC = "telemetry.snapshots.v1";
 
     public void start() {
-        consumer.subscribe(List.of(SNAPSHOTS_TOPIC));
-        log.info("✅ Подписка на топик снапшотов: {}", SNAPSHOTS_TOPIC);
+        consumer.subscribe(List.of(props.getSnapshotsTopic()));
+        log.info("✅ Подписка на топик снапшотов: {}", props.getSnapshotsTopic());
 
         try {
             while (true) {

@@ -11,11 +11,6 @@ spring:
       hibernate:
         format_sql: true
 
-aggregator:
-  input-topic: telemetry.sensors.v1
-  output-topic: telemetry.snapshots.v1
-  hub-topic: telemetry.hubs.v1
-
 grpc:
   client:
     hub-router:
@@ -23,6 +18,10 @@ grpc:
       enableKeepAlive: true
       keepAliveWithoutCalls: true
       negotiationType: plaintext
+
+analyzer:
+  hub-topic: telemetry.hubs.v1
+  snapshots-topic: telemetry.snapshots.v1
 
 logging:
   level:

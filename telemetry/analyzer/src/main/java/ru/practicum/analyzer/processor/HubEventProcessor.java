@@ -7,6 +7,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.errors.WakeupException;
 import org.springframework.stereotype.Component;
+import ru.practicum.analyzer.config.AnalyzerProperties;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
 
 import java.time.Duration;
@@ -18,13 +19,12 @@ import java.util.List;
 public class HubEventProcessor implements Runnable {
 
     private final Consumer<String, HubEventAvro> consumer;
-
-    private static final String HUB_EVENTS_TOPIC = "telemetry.hubs.v1";
+    private final AnalyzerProperties props;
 
     @Override
     public void run() {
-        consumer.subscribe(List.of(HUB_EVENTS_TOPIC));
-        log.info("✅ Подписка на топик с хаб-событиями: {}", HUB_EVENTS_TOPIC);
+        consumer.subscribe(List.of(props.getHubTopic()));
+        log.info("✅ Подписка на топик с хаб-событиями: {}", props.getHubTopic());
 
         try {
             while (true) {

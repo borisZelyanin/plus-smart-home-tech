@@ -20,7 +20,6 @@
         <module>telemetry</module>
         <module>infra</module>
         <module>commerce</module>
-        <module>telemetry/hub-router-client</module>
     </modules>
 
     <properties>
