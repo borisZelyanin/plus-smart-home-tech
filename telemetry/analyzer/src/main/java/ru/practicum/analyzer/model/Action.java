@@ -24,6 +24,10 @@ public class Action {
     private Integer value;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "scenario_id", nullable = false)
+    private Scenario scenario;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sensor_id", nullable = false)
     private Sensor sensor;
 }

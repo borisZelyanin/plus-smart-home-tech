@@ -64,7 +64,7 @@ public class ScenarioEvaluator {
 
         Integer actualValue;
         try {
-            ConditionType conditionType = ConditionType.valueOf(condition.getType());
+            ConditionType conditionType = ConditionType.valueOf(condition.getType().name());
 
             switch (conditionType) {
                 case TEMPERATURE -> {
@@ -110,7 +110,7 @@ public class ScenarioEvaluator {
         log.debug("📐 Сравнение: фактическое={} ожидаемое={} операция={}",
                 actualValue, condition.getValue(), condition.getOperation());
 
-        return switch (condition.getOperation()) {
+        return switch (condition.getOperation().name()) {
             case "EQUALS" -> actualValue.equals(condition.getValue());
             case "GREATER_THAN" -> actualValue > condition.getValue();
             case "LOWER_THAN" -> actualValue < condition.getValue();
