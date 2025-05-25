@@ -3,6 +3,10 @@ spring:
     url: jdbc:postgresql://localhost:5432/smart_home
     username: postgres
     password: postgres
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: aggregator-group
   jpa:
     hibernate:
       ddl-auto: update
@@ -22,6 +26,7 @@ grpc:
 analyzer:
   hub-topic: telemetry.hubs.v1
   snapshots-topic: telemetry.snapshots.v1
+
 
 logging:
   level:
