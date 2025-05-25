@@ -34,27 +34,41 @@ public class HubEventProcessor implements Runnable {
 
     @Override
     public void run() {
-        consumer.subscribe(List.of(props.getHubTopic()));
-        log.info("✅ Подписка на топик с хаб-событиями: {}", props.getHubTopic());
+        log.info("🚀 Запуск HubEventProcessor...");
+
+        // Подписка на топик
+        String topic = props.getHubTopic();
+        consumer.subscribe(List.of(topic));
+        log.info("✅ Подписка на топик с хаб-событиями: {}", topic);
 
         try {
             while (true) {
+                log.debug("📡 Ожидание новых сообщений из Kafka...");
+
                 ConsumerRecords<String, HubEventAvro> records = consumer.poll(Duration.ofMillis(2000));
+                int count = records.count();
+                log.debug("📥 Получено {} записей из Kafka", count);
 
                 for (ConsumerRecord<String, HubEventAvro> record : records) {
                     HubEventAvro event = record.value();
+                    log.debug("🔍 Обработка события от хаба '{}': ключ='{}', offset={}, partition={}",
+                            event.getHubId(), record.key(), record.offset(), record.partition());
                     handleEvent(event);
                 }
 
+                log.debug("💾 Асинхронный коммит offset'ов...");
                 consumer.commitAsync();
             }
         } catch (WakeupException ignored) {
-            log.info("🛑 Завершение обработки событий хаба");
+            log.info("🛑 Завершение обработки событий хаба по сигналу Wakeup");
         } catch (Exception e) {
-            log.error("💥 Ошибка обработки событий хаба", e);
+            log.error("💥 Необработанная ошибка во время обработки событий", e);
         } finally {
             try {
+                log.info("💾 Финальный синхронный коммит offset'ов...");
                 consumer.commitSync();
+            } catch (Exception e) {
+                log.warn("⚠ Ошибка при финальном коммите offset'ов", e);
             } finally {
                 consumer.close();
                 log.info("🧹 Consumer хаба закрыт");
