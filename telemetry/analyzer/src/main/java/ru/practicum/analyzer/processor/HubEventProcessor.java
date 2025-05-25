@@ -132,11 +132,18 @@ public class HubEventProcessor implements Runnable {
                     condition.setScenario(scenario);
                     condition.setType(ConditionType.valueOf(proto.getType().name()));
                     condition.setOperation(ConditionOperation.valueOf(proto.getOperation().name()));
-                    condition.setValue(
-                            proto.getValue() instanceof Integer intVal ? intVal :
-                                    Boolean.TRUE.equals(proto.getValue()) ? 1 :
-                                            Boolean.FALSE.equals(proto.getValue()) ? 0 : 0
-                    );
+                    Object rawValue = proto.getValue();
+                    Integer value = null;
+
+                    if (rawValue instanceof Integer intValue) {
+                        value = intValue;
+                    } else if (Boolean.TRUE.equals(rawValue)) {
+                        value = 1;
+                    } else if (Boolean.FALSE.equals(rawValue)) {
+                        value = 0;
+                    }
+
+                    condition.setValue(value != null ? value : 0);
                     return condition;
                 })
                 .filter(Objects::nonNull)
