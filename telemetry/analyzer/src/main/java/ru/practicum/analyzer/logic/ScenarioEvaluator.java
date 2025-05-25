@@ -29,6 +29,9 @@ public class ScenarioEvaluator {
         Instant timestamp = snapshot.getTimestamp();
         Map<String, SensorStateAvro> sensorsState = snapshot.getSensorsState();
 
+        log.debug("📥 Получен снапшот: hubId={}, timestamp={}, sensors={}",
+                hubId, timestamp, sensorsState.keySet());
+
         List<Scenario> scenarios = scenarioRepository.findByHubId(hubId);
         if (scenarios.isEmpty()) {
             log.info("📭 Нет сценариев для анализа для хаба: {}", hubId);
@@ -38,20 +41,16 @@ public class ScenarioEvaluator {
 
         for (Scenario scenario : scenarios) {
             boolean allConditionsMet = scenario.getConditions().stream().allMatch(scenarioCondition -> {
-                String sensorId = scenarioCondition.getSensor().getId(); // так если у ScenarioCondition есть getSensor()
+                String sensorId = scenarioCondition.getSensor().getId();
                 SensorStateAvro state = sensorsState.get(sensorId);
-                return evaluateCondition(scenarioCondition.getCondition(), state); // достаём Condition
+                log.debug("🔍 Проверка условия для сенсора: {}", sensorId);
+                return evaluateCondition(scenarioCondition.getCondition(), state);
             });
 
             if (allConditionsMet) {
                 log.info("✅ Условия выполнены для сценария: {}", scenario.getName());
                 for (ScenarioAction scenarioAction : scenario.getActions()) {
-                    hubClient.sendAction(
-                            hubId,
-                            scenario.getName(),
-                            scenarioAction.getAction(), // достаём Action
-                            timestamp
-                    );
+                    hubClient.sendAction(hubId, scenario.getName(), scenarioAction.getAction(), timestamp);
                 }
             } else {
                 log.debug("⛔ Сценарий не выполнен: {}", scenario.getName());
@@ -61,7 +60,6 @@ public class ScenarioEvaluator {
 
     private boolean evaluateCondition(Condition condition, SensorStateAvro state) {
         if (state == null) return false;
-
         Objects.requireNonNull(condition.getValue(), "Condition value must not be null");
 
         Integer actualValue;
@@ -99,12 +97,18 @@ public class ScenarioEvaluator {
                 }
             }
 
-            if (actualValue == null) return false;
+            if (actualValue == null) {
+                log.warn("⚠ Значение сенсора не определено для условия: {}", condition);
+                return false;
+            }
 
         } catch (Exception e) {
             log.warn("⚠ Ошибка при обработке условия", e);
             return false;
         }
+
+        log.debug("📐 Сравнение: фактическое={} ожидаемое={} операция={}",
+                actualValue, condition.getValue(), condition.getOperation());
 
         return switch (condition.getOperation()) {
             case "EQUALS" -> actualValue.equals(condition.getValue());
@@ -116,7 +120,6 @@ public class ScenarioEvaluator {
             }
         };
     }
-
     @SuppressWarnings("unchecked")
     private <T> T extractSensorData(SensorStateAvro state, Class<T> expectedClass) {
         Object payload = state.getData();
