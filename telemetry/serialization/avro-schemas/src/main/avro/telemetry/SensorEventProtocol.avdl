@@ -30,7 +30,7 @@ protocol SensorEventProtocol {
   record SensorEventAvro {
     string id;
     string hubId;
-    long timestamp; // logicalType: timestamp-millis
+    timestamp_ms timestamp; // logicalType: timestamp-millis
     union { ClimateSensorAvro, LightSensorAvro, MotionSensorAvro, SwitchSensorAvro, TemperatureSensorAvro } payload;
   }
 }

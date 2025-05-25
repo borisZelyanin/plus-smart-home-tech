@@ -80,7 +80,7 @@ public class HubEventMapper {
     private HubEventAvro buildHubEventAvro(String hubId, Instant timestamp, Object payload) {
         return HubEventAvro.newBuilder()
                 .setHubId(hubId)
-                .setTimestamp(timestamp != null ? timestamp.toEpochMilli() : System.currentTimeMillis())
+                .setTimestamp(timestamp != null ? timestamp : Instant.now())
                 .setPayload(payload)
                 .build();
     }
