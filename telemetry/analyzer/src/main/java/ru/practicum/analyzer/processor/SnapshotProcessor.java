@@ -35,7 +35,7 @@ public class SnapshotProcessor {
 
                 for (ConsumerRecord<String, SensorsSnapshotAvro> record : records) {
                     SensorsSnapshotAvro snapshot = record.value();
-                    log.info("🔍 Обработка снапшота: {}", snapshot.getHubId());
+                    log.info("🔍 Обработка снапшота: {} ", snapshot.getHubId());
 
                     scenarioEvaluator.evaluate(snapshot);
                 }
