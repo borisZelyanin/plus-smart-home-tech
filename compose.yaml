@@ -4,8 +4,8 @@ services:
     hostname: kafka
     container_name: kafka
     ports:
-      - "9092:9092" # for client connections
-      - "9101:9101" # JMX
+      - "9092:9092"
+      - "9101:9101"
       - "29092:29092"
     restart: unless-stopped
     environment:
@@ -34,6 +34,7 @@ services:
                              --partitions 1 --replication-factor 1 --if-not-exists \
                              --bootstrap-server kafka:29092'"
     init: true
+
   kafka-ui:
     container_name: kafka-ui
     hostname: kafka-ui
@@ -45,3 +46,14 @@ services:
       KAFKA_CLUSTERS_0_NAME: wizard_test
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
 
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: smart_home
+    volumes:
+      - /Users/zelaninyzelanin/pg/volume/15:/var/lib/postgresql/data
