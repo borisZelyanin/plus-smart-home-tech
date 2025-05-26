@@ -9,7 +9,6 @@ import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.WakeupException;
 import org.springframework.stereotype.Component;
-
 import ru.practicum.analyzer.config.AnalyzerProperties;
 import ru.practicum.analyzer.logic.HubRegistry;
 import ru.yandex.practicum.kafka.telemetry.event.*;
@@ -20,7 +19,6 @@ import java.util.*;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-
 public class HubEventProcessor implements Runnable {
 
     private final Consumer<String, HubEventAvro> consumer;
