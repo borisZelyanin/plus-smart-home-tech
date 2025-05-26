@@ -39,9 +39,10 @@ public class SnapshotProcessor {
                     log.info("🔍 Обработка снапшота: {} ", snapshot.getHubId());
 
                     scenarioEvaluator.handle(snapshot);
+                    consumer.commitAsync();
                 }
 
-                consumer.commitAsync();
+
             }
         } catch (WakeupException ignored) {
             log.info("🛑 Завершение обработки снапшотов");

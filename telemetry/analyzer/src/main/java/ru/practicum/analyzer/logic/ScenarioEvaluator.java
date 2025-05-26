@@ -50,7 +50,7 @@ public class ScenarioEvaluator {
             grpcClient.sendAction(toRequest(action));
         }
 
-        log.info("📤 Отправлено команд: {}", actions.size());
+        log.info("📤 😂 Отправлено команд: {}", actions.size());
     }
 
     private List<Scenario> evaluateScenarios(String hubId, SensorsSnapshotAvro snapshot) {
