@@ -4,6 +4,7 @@ import com.google.protobuf.Empty;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
+import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
 
 import ru.practicum.collector.handler.sensor.SensorEventHandler;
@@ -17,6 +18,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Slf4j
 @GrpcService
 public class EventController extends CollectorControllerGrpc.CollectorControllerImplBase {
 
@@ -36,11 +38,10 @@ public class EventController extends CollectorControllerGrpc.CollectorController
     public void collectSensorEvent(SensorEventProto request, StreamObserver<Empty> responseObserver) {
         try {
             SensorEventProto.PayloadCase payloadType = request.getPayloadCase();
-
+            log.debug("👨‍🦽 collectSensorEvent 🤢 Запрос в чистом виде {} ",request);
             if (!sensorHandlers.containsKey(payloadType)) {
                 throw new IllegalArgumentException("❌ Неизвестный тип сенсорного события: " + payloadType);
             }
-
             sensorHandlers.get(payloadType).handle(request);
 
             responseObserver.onNext(Empty.getDefaultInstance());
@@ -56,7 +57,7 @@ public class EventController extends CollectorControllerGrpc.CollectorController
     public void collectHubEvent(HubEventProto request, StreamObserver<Empty> responseObserver) {
         try {
             HubEventProto.PayloadCase payloadType = request.getPayloadCase();
-
+            log.debug("👨‍🦽collectHubEvent 👀 Запрос в чистом виде {} ",request);
             if (!hubHandlers.containsKey(payloadType)) {
                 throw new IllegalArgumentException("❌ Неизвестный тип события хаба: " + payloadType);
             }
