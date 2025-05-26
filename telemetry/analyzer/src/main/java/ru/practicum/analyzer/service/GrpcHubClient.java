@@ -9,16 +9,28 @@ import ru.yandex.practicum.grpc.telemetry.hubRouter.HubRouterControllerGrpc;
 @Slf4j
 @Component
 public class GrpcHubClient {
+
     private final HubRouterControllerGrpc.HubRouterControllerBlockingStub hubRouterClient;
 
     public GrpcHubClient(@GrpcClient("hub-router")
-                               HubRouterControllerGrpc.HubRouterControllerBlockingStub hubRouterClient) {
+                         HubRouterControllerGrpc.HubRouterControllerBlockingStub hubRouterClient) {
         this.hubRouterClient = hubRouterClient;
     }
 
-    public void sendAction(DeviceActionRequest deviceActionRequest) {
-        log.info("📤 Отправка команды в HubRouter: {}", deviceActionRequest);
-        var response = hubRouterClient.handleDeviceAction(deviceActionRequest);
-        log.info("✅ Ответ от HubRouter получен: {}", response);
+    /**
+     * Отправка действия в gRPC-сервис хаба
+     * @param request gRPC-сообщение с действием
+     */
+    public void sendAction(DeviceActionRequest request) {
+        try {
+            log.info("📤 Отправка команды в Hub Router: сценарий='{}', сенсор='{}'",
+                    request.getScenarioName(), request.getAction().getSensorId());
+
+            hubRouterClient.handleDeviceAction(request);
+
+            log.info("✅ Команда успешно отправлена");
+        } catch (Exception e) {
+            log.error("❌ Ошибка при отправке команды в Hub Router", e);
+        }
     }
 }
