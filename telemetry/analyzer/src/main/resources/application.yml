@@ -1,6 +1,7 @@
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/smart_home
+    driver-class-name: org.postgresql.Driver
     username: postgres
     password: postgres
   kafka:
