@@ -56,7 +56,7 @@ public class ScenarioEvaluator {
         List<Condition> allConditions = conditionRepository.findAllByScenarioHubId(hubId);
 
         Supplier<Stream<SensorEventWrapper>> sensorStream = () ->
-                states.entrySet().stream().map(e -> new SensorEventWrapper(e.getKey(), e.getValue().getData()));
+                states.entrySet().stream().map(e -> new SensorEventWrapper(e.getKey(), e.getValue()));
 
         Map<Condition, Boolean> results = new HashMap<>();
         for (Condition condition : allConditions) {

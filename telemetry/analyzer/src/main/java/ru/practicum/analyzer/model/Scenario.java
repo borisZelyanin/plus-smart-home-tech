@@ -5,22 +5,26 @@ import lombok.*;
 
 import java.util.List;
 
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.FieldDefaults;
+
 @Entity
-@Table(name = "scenarios", uniqueConstraints = @UniqueConstraint(columnNames = {"hubId", "name"}))
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@Setter
+@ToString
+@Table(name = "scenarios")
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Scenario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    int id;
 
-    private String hubId;
-    private String name;
+    @Column(name = "hub_id")
+    String hubId;
 
-    @OneToMany(mappedBy = "scenario", cascade = CascadeType.ALL)
-    private List<ScenarioCondition> conditions;
-
-    @OneToMany(mappedBy = "scenario", cascade = CascadeType.ALL)
-    private List<ScenarioAction> actions;
+    String name;
 }
