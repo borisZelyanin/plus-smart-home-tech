@@ -106,11 +106,25 @@ public class ScenarioEvaluator {
 
         return triggered;
     }
+
     private boolean evaluateCondition(Stream<SensorEventWrapper> stream, Condition condition) {
+        String sensorId = condition.getSensor().getId();
+        Predicate<Integer> predicate = buildPredicate(condition);
+
         return stream
-                .filter(e -> e.getId().equals(condition.getSensor().getId()))
+                .filter(e -> e.getId().equals(sensorId))
                 .map(extractValue(condition))
-                .anyMatch(buildPredicate(condition));
+                .peek(actualValue -> log.debug("""
+                🔎 Проверка значения сенсора:
+                  - sensorId:     {}
+                  - значение:     {}
+                  - ожидается:    {} {} 
+            """,
+                        sensorId,
+                        actualValue,
+                        condition.getOperation(),
+                        condition.getValue()))
+                .anyMatch(predicate);
     }
 
     private Predicate<Integer> buildPredicate(Condition condition) {
