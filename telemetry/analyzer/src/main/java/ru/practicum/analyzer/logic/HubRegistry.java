@@ -166,21 +166,38 @@ public class HubRegistry {
         condition.setOperation(ConditionOperation.valueOf(proto.getOperation().name()));
 
         Object val = proto.getValue();
+
         if (val instanceof Integer i) {
             condition.setValue(i);
+            log.debug("✅ Условие: int value={}, sensorId={}, type={}, operation={}",
+                    i, proto.getSensorId(), proto.getType(), proto.getOperation());
+        } else if (val instanceof Boolean b) {
+            int boolValue = b ? 1 : 0;
+            condition.setValue(boolValue);
+            log.debug("✅ Условие: bool value={}, sensorId={}, type={}, operation={}",
+                    b, proto.getSensorId(), proto.getType(), proto.getOperation());
         } else {
-            condition.setValue(Boolean.TRUE.equals(val) ? 1 : 0);
+            log.warn("⚠ Неожиданное или отсутствующее значение в условии: sensorId={}, value={}, type={}, operation={}",
+                    proto.getSensorId(), val, proto.getType(), proto.getOperation());
+            condition.setValue(0); // дефолт
         }
 
         return condition;
     }
-
     private Action mapAction(Scenario scenario, DeviceActionAvro proto, Sensor sensor) {
         Action action = new Action();
         action.setScenario(scenario);
         action.setSensor(sensor);
         action.setType(ActionType.valueOf(proto.getType().name()));
-        action.setValue(proto.getValue());
+
+        Integer value = proto.getValue();
+        if (value != null) {
+            action.setValue(value);
+        } else {
+            log.warn("⚠ Значение действия отсутствует: sensorId='{}', type='{}', сценарий='{}'",
+                    proto.getSensorId(), proto.getType(), scenario.getName());
+            action.setValue(0); // или не устанавливай вовсе, если логика позволяет
+        }
+
         return action;
     }
-}
