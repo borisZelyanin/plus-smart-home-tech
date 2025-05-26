@@ -1,11 +1,11 @@
 syntax = "proto3";
 
-package telemetry.service.hubRouter;
+package telemetry.service.hubrouter;
 
 import "google/protobuf/empty.proto";
 import "telemetry/messages/hub_event.proto";
 
-option java_package = "ru.yandex.practicum.grpc.telemetry.hubRouter";
+option java_package = "ru.yandex.practicum.grpc.telemetry.hubrouter";
 option java_outer_classname = "HubRouterControllerProto";
 
 service HubRouterController {
