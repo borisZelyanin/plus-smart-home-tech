@@ -2,13 +2,13 @@ package ru.practicum.analyzer.service;
 
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import ru.yandex.practicum.grpc.telemetry.event.DeviceActionRequest;
 import ru.yandex.practicum.grpc.telemetry.hubrouter.HubRouterControllerGrpc  ;
 
 
 @Slf4j
-@Component
+@Service
 public class GrpcHubClient {
 
     private HubRouterControllerGrpc.HubRouterControllerBlockingStub hubRouterClient;
