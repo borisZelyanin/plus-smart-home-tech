@@ -38,7 +38,7 @@ public class SnapshotProcessor {
                     log.debug("📦 Получен event: {}", record);
                     log.info("🔍 Обработка снапшота: {} ", snapshot.getHubId());
 
-                    scenarioEvaluator.evaluate(snapshot);
+                    scenarioEvaluator.handle(snapshot);
                 }
 
                 consumer.commitAsync();
