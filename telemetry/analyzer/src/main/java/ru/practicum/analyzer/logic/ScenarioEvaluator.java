@@ -96,20 +96,57 @@ public class ScenarioEvaluator {
     private Function<SensorEventWrapper, Integer> extractValue(Condition condition) {
         return event -> {
             Object data = event.getData();
+            String sensorId = event.getId();
+
             try {
                 return switch (condition.getType()) {
-                    case MOTION -> ((MotionSensorAvro) data).getMotion() ? 1 : 0;
-                    case LUMINOSITY -> ((LightSensorAvro) data).getLuminosity();
-                    case SWITCH -> ((SwitchSensorAvro) data).getState() ? 1 : 0;
-                    case TEMPERATURE -> {
-                        if (data instanceof ClimateSensorAvro c) yield c.getTemperatureC();
-                        yield ((TemperatureSensorAvro) data).getTemperatureC();
+                    case MOTION -> {
+                        if (data instanceof MotionSensorAvro motion) {
+                            yield motion.getMotion() ? 1 : 0;
+                        }
+                        log.warn("⚠ Ожидался MotionSensorAvro для сенсора '{}', получено: {}", sensorId, data.getClass().getSimpleName());
+                        yield -1;
                     }
-                    case CO2LEVEL -> ((ClimateSensorAvro) data).getCo2Level();
-                    case HUMIDITY -> ((ClimateSensorAvro) data).getHumidity();
+                    case LUMINOSITY -> {
+                        if (data instanceof LightSensorAvro light) {
+                            yield light.getLuminosity();
+                        }
+                        log.warn("⚠ Ожидался LightSensorAvro для сенсора '{}', получено: {}", sensorId, data.getClass().getSimpleName());
+                        yield -1;
+                    }
+                    case SWITCH -> {
+                        if (data instanceof SwitchSensorAvro sw) {
+                            yield sw.getState() ? 1 : 0;
+                        }
+                        log.warn("⚠ Ожидался SwitchSensorAvro для сенсора '{}', получено: {}", sensorId, data.getClass().getSimpleName());
+                        yield -1;
+                    }
+                    case TEMPERATURE -> {
+                        if (data instanceof ClimateSensorAvro climate) {
+                            yield climate.getTemperatureC();
+                        } else if (data instanceof TemperatureSensorAvro temp) {
+                            yield temp.getTemperatureC();
+                        }
+                        log.warn("⚠ Не удалось извлечь TEMPERATURE для сенсора '{}'. Тип данных: {}", sensorId, data.getClass().getSimpleName());
+                        yield -1;
+                    }
+                    case CO2LEVEL -> {
+                        if (data instanceof ClimateSensorAvro climate) {
+                            yield climate.getCo2Level();
+                        }
+                        log.warn("⚠ Ожидался ClimateSensorAvro для CO2LEVEL, сенсор '{}', получено: {}", sensorId, data.getClass().getSimpleName());
+                        yield -1;
+                    }
+                    case HUMIDITY -> {
+                        if (data instanceof ClimateSensorAvro climate) {
+                            yield climate.getHumidity();
+                        }
+                        log.warn("⚠ Ожидался ClimateSensorAvro для HUMIDITY, сенсор '{}', получено: {}", sensorId, data.getClass().getSimpleName());
+                        yield -1;
+                    }
                 };
             } catch (Exception e) {
-                log.warn("⚠ Ошибка извлечения значения из сенсора: {}: {}", event.getId(), e.getMessage());
+                log.warn("⚠ Ошибка извлечения значения из сенсора '{}': {}", sensorId, e.getMessage(), e);
                 return -1;
             }
         };
