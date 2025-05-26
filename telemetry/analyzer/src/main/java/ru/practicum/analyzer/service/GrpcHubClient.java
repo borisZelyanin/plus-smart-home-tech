@@ -28,7 +28,7 @@ public class GrpcHubClient {
                     request.getScenarioName(), request.getAction().getSensorId());
 
             hubRouterClient.handleDeviceAction(request);
-
+            log.debug("Команда отправлена 📧  виде ⚽️{} ",request);
             log.info("✅ Команда успешно отправлена");
         } catch (Exception e) {
             log.error("❌ Ошибка при отправке команды в Hub Router", e);
