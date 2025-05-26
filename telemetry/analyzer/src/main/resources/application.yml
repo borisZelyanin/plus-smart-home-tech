@@ -7,11 +7,13 @@ spring:
     bootstrap-servers: localhost:9092
   jpa:
     hibernate:
-      ddl-auto: update
-    show-sql: true
+      ddl-auto: none
     properties:
       hibernate:
         format_sql: true
+  sql:
+    init:
+      mode: always
 
 grpc:
   client:
