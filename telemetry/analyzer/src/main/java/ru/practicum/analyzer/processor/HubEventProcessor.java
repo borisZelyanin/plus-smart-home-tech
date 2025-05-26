@@ -50,6 +50,7 @@ public class HubEventProcessor implements Runnable {
                     log.debug("📦 Получен event: {}", record);
                     log.debug("🔍 Обработка события от хаба '{}': ключ='{}', offset={}, partition={}",
                             event.getHubId(), record.key(), record.offset(), record.partition());
+                    handleEvent.handle(event);
                     log.debug("💾 Асинхронный коммит offset'ов...");
                     manageOffsets(record, consumer);
                 }
