@@ -3,31 +3,34 @@ package ru.practicum.analyzer.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.FieldDefaults;
+
 @Entity
-@Table(name = "actions")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@ToString
+@Table(name = "actions")
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@SecondaryTable(name = "scenario_actions", pkJoinColumns = @PrimaryKeyJoinColumn(name = "action_id"))
 public class Action {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    int id;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private ActionType type;
+    ActionType type;
+    int value;
 
-    @Column
-    private Integer value;
+    @ManyToOne
+    @JoinColumn(name = "scenario_id", table = "scenario_actions")
+    Scenario scenario;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "scenario_id", nullable = false)
-    private Scenario scenario;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sensor_id", nullable = false)
-    private Sensor sensor;
+    @ManyToOne()
+    @JoinColumn(name = "sensor_id", table = "scenario_actions")
+    Sensor sensor;
 }
