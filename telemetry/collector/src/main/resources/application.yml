@@ -29,6 +29,7 @@ logging:
         web: DEBUG
       io:
         grpc: DEBUG
+      ru.practicum.collector: TRACE
 
 grpc:
   server:
