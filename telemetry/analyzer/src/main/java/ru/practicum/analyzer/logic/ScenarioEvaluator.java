@@ -14,15 +14,12 @@ import ru.yandex.practicum.grpc.telemetry.event.DeviceActionRequest;
 import ru.yandex.practicum.kafka.telemetry.event.*;
 
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 
 @Slf4j
 @Service
@@ -35,145 +32,102 @@ public class ScenarioEvaluator {
 
     public void handle(SensorsSnapshotAvro snapshot) {
         String hubId = snapshot.getHubId();
-        log.info("Handle snapshot from hub ID: \"{}\"", hubId);
-        List<Scenario> successfulScenarios = checkScenario(hubId, snapshot);
+        log.info("📥 Получен снапшот от хаба: {}", hubId);
+
+        List<Scenario> successfulScenarios = evaluateScenarios(hubId, snapshot);
+
         if (successfulScenarios.isEmpty()) {
-            log.info("Snapshot processing completed from hub ID: \"{}\". No successful scenarios", hubId);
+            log.info("📭 Нет сработавших сценариев для хаба: {}", hubId);
             return;
         }
-        log.info("Scenarios worked: {} from hub ID: \"{}\"", successfulScenarios, hubId);
+
+        log.info("✅ Сработавшие сценарии: {}", successfulScenarios.stream().map(Scenario::getName).toList());
+
         List<Action> actions = actionRepository.findAllByScenarioIn(successfulScenarios);
         for (Action action : actions) {
-            grpcClient.sendAction(mapToActionRequest(action));
+            grpcClient.sendAction(toRequest(action));
         }
-        log.info("Actions: {} send to hub ID: \"{}\"", actions, hubId);
+
+        log.info("📤 Отправлено команд: {}", actions.size());
     }
 
-    private SensorEventWrapper mapToWrapper(String sensorId, SensorStateAvro sensorStateAvro) {
-        SensorEventWrapper wrapper = new SensorEventWrapper();
-        wrapper.setId(sensorId);
-        wrapper.setData(sensorStateAvro.getData());
-        return wrapper;
+    private List<Scenario> evaluateScenarios(String hubId, SensorsSnapshotAvro snapshot) {
+        Map<String, SensorStateAvro> states = snapshot.getSensorsState();
+        List<Condition> allConditions = conditionRepository.findAllByScenarioHubId(hubId);
+
+        Supplier<Stream<SensorEventWrapper>> sensorStream = () ->
+                states.entrySet().stream().map(e -> new SensorEventWrapper(e.getKey(), e.getValue().getData()));
+
+        Map<Condition, Boolean> results = new HashMap<>();
+        for (Condition condition : allConditions) {
+            boolean met = evaluateCondition(sensorStream.get(), condition);
+            results.put(condition, met);
+            log.debug("📐 Проверка условия [{}]: {} → {}", condition.getId(), condition.getType(), met);
+        }
+
+        return results.entrySet().stream()
+                .collect(Collectors.groupingBy(
+                        entry -> entry.getKey().getScenario(),
+                        Collectors.mapping(Map.Entry::getValue, Collectors.toList())
+                ))
+                .entrySet().stream()
+                .filter(entry -> entry.getValue().stream().allMatch(Boolean::booleanValue))
+                .map(Map.Entry::getKey)
+                .toList();
     }
 
-    private DeviceActionRequest mapToActionRequest(Action action) {
-        Scenario scenario = action.getScenario();
-        Instant ts = Instant.now();
-        Timestamp timestamp = Timestamp.newBuilder()
-                .setSeconds(ts.getEpochSecond())
-                .setNanos(ts.getNano())
-                .build();
-        DeviceActionProto deviceActionProto = DeviceActionProto.newBuilder()
+    private boolean evaluateCondition(Stream<SensorEventWrapper> stream, Condition condition) {
+        return stream
+                .filter(e -> e.getId().equals(condition.getSensor().getId()))
+                .map(extractValue(condition))
+                .anyMatch(buildPredicate(condition));
+    }
+
+    private Predicate<Integer> buildPredicate(Condition condition) {
+        return switch (condition.getOperation()) {
+            case EQUALS -> x -> x == condition.getValue();
+            case GREATER_THAN -> x -> x > condition.getValue();
+            case LOWER_THAN -> x -> x < condition.getValue();
+        };
+    }
+
+    private Function<SensorEventWrapper, Integer> extractValue(Condition condition) {
+        return event -> {
+            Object data = event.getData();
+            try {
+                return switch (condition.getType()) {
+                    case MOTION -> ((MotionSensorAvro) data).getMotion() ? 1 : 0;
+                    case LUMINOSITY -> ((LightSensorAvro) data).getLuminosity();
+                    case SWITCH -> ((SwitchSensorAvro) data).getState() ? 1 : 0;
+                    case TEMPERATURE -> {
+                        if (data instanceof ClimateSensorAvro c) yield c.getTemperatureC();
+                        yield ((TemperatureSensorAvro) data).getTemperatureC();
+                    }
+                    case CO2LEVEL -> ((ClimateSensorAvro) data).getCo2Level();
+                    case HUMIDITY -> ((ClimateSensorAvro) data).getHumidity();
+                };
+            } catch (Exception e) {
+                log.warn("⚠ Ошибка извлечения значения из сенсора: {}: {}", event.getId(), e.getMessage());
+                return -1;
+            }
+        };
+    }
+
+    private DeviceActionRequest toRequest(Action action) {
+        Instant now = Instant.now();
+        DeviceActionProto proto = DeviceActionProto.newBuilder()
                 .setSensorId(action.getSensor().getId())
                 .setType(ActionTypeProto.valueOf(action.getType().name()))
                 .setValue(action.getValue())
                 .build();
         return DeviceActionRequest.newBuilder()
-                .setHubId(scenario.getHubId())
-                .setScenarioName(scenario.getName())
-                .setAction(deviceActionProto)
-                .setTimestamp(timestamp)
+                .setHubId(action.getScenario().getHubId())
+                .setScenarioName(action.getScenario().getName())
+                .setAction(proto)
+                .setTimestamp(Timestamp.newBuilder()
+                        .setSeconds(now.getEpochSecond())
+                        .setNanos(now.getNano())
+                        .build())
                 .build();
     }
-
-    private List<Scenario> checkScenario(String hubId, SensorsSnapshotAvro snapshot) {
-        List<Condition> conditions = conditionRepository.findAllByScenarioHubId(hubId);
-        Supplier<Stream<SensorEventWrapper>> streamSupplier = () -> snapshot.getSensorsState().entrySet().stream()
-                .map(e -> mapToWrapper(e.getKey(), e.getValue()));
-
-        Map<Condition, Boolean> result = new HashMap<>();
-        for (Condition condition : conditions) {
-            boolean isConditionDone = checkCondition(streamSupplier.get(), condition);
-            result.put(condition, isConditionDone);
-        }
-
-        Map<Scenario, List<Boolean>> scenarios = result.entrySet().stream()
-                .collect(Collectors.groupingBy(e -> e.getKey().getScenario(),
-                        Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
-
-        return scenarios.entrySet().stream()
-                .filter(e -> !e.getValue().contains(false))
-                .map(Map.Entry::getKey)
-                .toList();
-    }
-
-    private boolean checkCondition(Stream<SensorEventWrapper> stream, Condition condition) {
-        return stream.filter(o -> o.getId().equals(condition.getSensor().getId()))
-                .map(getFunction(condition))
-                .anyMatch(getPredicate(condition));
-    }
-
-    private Predicate<Integer> getPredicate(Condition condition) {
-        ConditionOperation operation = condition.getOperation();
-        int value = condition.getValue();
-        Predicate<Integer> predicate;
-
-        switch (operation) {
-            case EQUALS -> predicate = x -> x == value;
-            case GREATER_THAN -> predicate = x -> x > value;
-            case LOWER_THAN -> predicate = x -> x < value;
-            default -> predicate = null;
-        }
-
-        return predicate;
-    }
-
-    Function<SensorEventWrapper, Integer> getFunction(Condition condition) {
-        ConditionType type = condition.getType();
-        Function<SensorEventWrapper, Integer> func;
-
-        switch (type) {
-            case MOTION -> func = x -> {
-                MotionSensorAvro data = (MotionSensorAvro) x.getData();
-                boolean motion = data.getMotion();
-                if (motion) {
-                    return 1;
-                } else {
-                    return 0;
-                }
-            };
-
-            case LUMINOSITY -> func = x -> {
-                LightSensorAvro data = (LightSensorAvro) x.getData();
-                return data.getLuminosity();
-            };
-
-            case SWITCH -> func = x -> {
-                SwitchSensorAvro data = (SwitchSensorAvro) x.getData();
-                boolean state = data.getState();
-                if (state) {
-                    return 1;
-                } else {
-                    return 0;
-                }
-            };
-
-            case TEMPERATURE -> func = x -> {
-                Object object = x.getData();
-                if (object instanceof ClimateSensorAvro) {
-                    ClimateSensorAvro data = (ClimateSensorAvro) object;
-                    return data.getTemperatureC();
-                } else {
-                    TemperatureSensorAvro data = (TemperatureSensorAvro) object;
-                    return data.getTemperatureC();
-                }
-            };
-
-            case CO2LEVEL -> func = x -> {
-                ClimateSensorAvro data = (ClimateSensorAvro) x.getData();
-                return data.getCo2Level();
-            };
-
-            case HUMIDITY ->
-                    func = x -> {
-                        ClimateSensorAvro data = (ClimateSensorAvro) x.getData();
-                        return data.getHumidity();
-                    };
-            default -> {
-                return null;
-            }
-        }
-        return func;
-    }
-
 }
