@@ -33,6 +33,8 @@ public class ScenarioEvaluator {
     public void handle(SensorsSnapshotAvro snapshot) {
         String hubId = snapshot.getHubId();
         log.info("📥 Получен снапшот от хаба: {}", hubId);
+        log.info("👨‍🦽 Получен снапшот от хаба: {}", snapshot);
+
 
         List<Scenario> successfulScenarios = evaluateScenarios(hubId, snapshot);
 
