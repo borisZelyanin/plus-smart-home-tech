@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.OffsetAndMetadata;
+import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.WakeupException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +26,7 @@ public class HubEventProcessor implements Runnable {
     private final Consumer<String, HubEventAvro> consumer;
     private final AnalyzerProperties props;
     private final HubRegistry handleEvent;
+    private static final Map<TopicPartition, OffsetAndMetadata> currentOffsets = new HashMap<>();
 
     @Override
     public void run() {
@@ -47,11 +50,11 @@ public class HubEventProcessor implements Runnable {
                     log.debug("📦 Получен event: {}", record);
                     log.debug("🔍 Обработка события от хаба '{}': ключ='{}', offset={}, partition={}",
                             event.getHubId(), record.key(), record.offset(), record.partition());
-                    handleEvent.handle(event);
+                    log.debug("💾 Асинхронный коммит offset'ов...");
+                    manageOffsets(record, consumer);
                 }
 
-                log.debug("💾 Асинхронный коммит offset'ов...");
-                consumer.commitAsync();
+
             }
         } catch (WakeupException ignored) {
             log.info("🛑 Завершение обработки событий хаба по сигналу Wakeup");
@@ -68,5 +71,12 @@ public class HubEventProcessor implements Runnable {
                 log.info("🧹 Consumer хаба закрыт");
             }
         }
+    }
+    private static void manageOffsets(ConsumerRecord<String, HubEventAvro> record,
+                                      Consumer<String, HubEventAvro> consumer) {
+        currentOffsets.put(
+                new TopicPartition(record.topic(), record.partition()),
+                new OffsetAndMetadata(record.offset() + 1)
+        );
     }
 }
