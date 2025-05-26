@@ -40,7 +40,7 @@ public class ScenarioEvaluator {
 
         if (successfulScenarios.isEmpty()) {
             log.info("📭 Нет сработавших сценариев для хаба: {}", hubId);
-            return;
+           // return;
         }
 
         log.info("✅ Сработавшие сценарии: {}", successfulScenarios.stream().map(Scenario::getName).toList());
