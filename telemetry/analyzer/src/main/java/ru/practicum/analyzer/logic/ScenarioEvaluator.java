@@ -50,12 +50,15 @@ public class ScenarioEvaluator {
             grpcClient.sendAction(toRequest(action));
         }
 
-        log.info("📤 😂 Отправлено команд: {}", actions.size());
+        log.info("📤 😂 Отправлено команд GRPC: {}", actions.size());
     }
 
     private List<Scenario> evaluateScenarios(String hubId, SensorsSnapshotAvro snapshot) {
         Map<String, SensorStateAvro> states = snapshot.getSensorsState();
         List<Condition> allConditions = conditionRepository.findAllByScenarioHubId(hubId);
+
+        log.info("📥 Анализ снапшота от хаба '{}'. Сенсоров: {}, условий: {}",
+                hubId, states.size(), allConditions.size());
 
         Supplier<Stream<SensorEventWrapper>> sensorStream = () ->
                 states.entrySet().stream().map(e -> new SensorEventWrapper(e.getKey(), e.getValue()));
@@ -63,21 +66,46 @@ public class ScenarioEvaluator {
         Map<Condition, Boolean> results = new HashMap<>();
         for (Condition condition : allConditions) {
             boolean met = evaluateCondition(sensorStream.get(), condition);
+
             results.put(condition, met);
-            log.debug("📐 Проверка условия [{}]: {} → {}", condition.getId(), condition.getType(), met);
+
+            log.debug("""
+            📐 Проверка условия:
+              - conditionId: {}
+              - sensorId:    {}
+              - type:        {}
+              - operation:   {}
+              - expected:    {}
+              - выполнено:   {}
+        """,
+                    condition.getId(),
+                    condition.getSensor().getId(),
+                    condition.getType(),
+                    condition.getOperation(),
+                    condition.getValue(),
+                    met
+            );
         }
 
-        return results.entrySet().stream()
+        Map<Scenario, List<Boolean>> grouped = results.entrySet().stream()
                 .collect(Collectors.groupingBy(
                         entry -> entry.getKey().getScenario(),
                         Collectors.mapping(Map.Entry::getValue, Collectors.toList())
-                ))
-                .entrySet().stream()
+                ));
+
+        List<Scenario> triggered = grouped.entrySet().stream()
                 .filter(entry -> entry.getValue().stream().allMatch(Boolean::booleanValue))
                 .map(Map.Entry::getKey)
                 .toList();
-    }
 
+        log.info("✅ Сценариев, сработавших по всем условиям: {}", triggered.size());
+
+        for (Scenario scenario : triggered) {
+            log.info("🔔 Сценарий сработал: '{}' для хаба '{}'", scenario.getName(), scenario.getHubId());
+        }
+
+        return triggered;
+    }
     private boolean evaluateCondition(Stream<SensorEventWrapper> stream, Condition condition) {
         return stream
                 .filter(e -> e.getId().equals(condition.getSensor().getId()))
@@ -154,19 +182,33 @@ public class ScenarioEvaluator {
 
     private DeviceActionRequest toRequest(Action action) {
         Instant now = Instant.now();
+
+        log.info("📦 Формирование gRPC-запроса для действия:");
+        log.info("  🔧 Сценарий: '{}'", action.getScenario().getName());
+        log.info("  🧭 Хаб: '{}'", action.getScenario().getHubId());
+        log.info("  🎯 Сенсор: '{}'", action.getSensor().getId());
+        log.info("  ⚙️ Тип действия: '{}'", action.getType());
+        log.info("  🧮 Значение: {}", action.getValue());
+
         DeviceActionProto proto = DeviceActionProto.newBuilder()
                 .setSensorId(action.getSensor().getId())
                 .setType(ActionTypeProto.valueOf(action.getType().name()))
                 .setValue(action.getValue())
                 .build();
-        return DeviceActionRequest.newBuilder()
+
+        Timestamp timestamp = Timestamp.newBuilder()
+                .setSeconds(now.getEpochSecond())
+                .setNanos(now.getNano())
+                .build();
+
+        DeviceActionRequest request = DeviceActionRequest.newBuilder()
                 .setHubId(action.getScenario().getHubId())
                 .setScenarioName(action.getScenario().getName())
                 .setAction(proto)
-                .setTimestamp(Timestamp.newBuilder()
-                        .setSeconds(now.getEpochSecond())
-                        .setNanos(now.getNano())
-                        .build())
+                .setTimestamp(timestamp)
                 .build();
+
+        log.debug("📨 gRPC-запрос сформирован: {}", request);
+        return request;
     }
 }
