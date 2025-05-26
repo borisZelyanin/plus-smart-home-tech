@@ -12,6 +12,8 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        default_schema: public
+    show-sql: true
   sql:
     init:
       mode: always
@@ -33,6 +35,7 @@ logging:
   level:
     root: INFO
     ru.practicum.analyzer: DEBUG
-    org.hibernate.SQL: DEBUG
+    org.hibernate.SQL: TRACE
     org.hibernate.type.descriptor.sql: TRACE
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.springframework.transaction.interceptor: TRACE
