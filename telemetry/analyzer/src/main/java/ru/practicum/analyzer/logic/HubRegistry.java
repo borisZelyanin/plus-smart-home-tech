@@ -55,6 +55,7 @@ public class HubRegistry {
             sensor.setId(id);
             sensor.setHubId(hubId);
             sensorRepository.save(sensor);
+            sensorRepository.flush();
             log.info("✅ Устройство сохранено: {}", sensor);
         } else {
             log.info("🔁 Устройство '{}' уже существует для хаба '{}'", id, hubId);

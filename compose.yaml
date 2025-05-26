@@ -46,14 +46,12 @@ services:
       KAFKA_CLUSTERS_0_NAME: wizard_test
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
 
-  postgres:
-    image: postgres:15
-    container_name: postgres
+  db:
+    image: postgres:16.1
+    container_name: smart-home-db
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: smart_home
-    volumes:
-      - /Users/zelaninyzelanin/pg/volume/15:/var/lib/postgresql/data
+      - POSTGRES_PASSWORD=pass
+      - POSTGRES_USER=user
+      - POSTGRES_DB=smart

@@ -1,9 +1,9 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/smart_home
+    url: jdbc:postgresql://localhost:5432/smart
     driver-class-name: org.postgresql.Driver
-    username: postgres
-    password: postgres
+    username: user
+    password: pass
   kafka:
     bootstrap-servers: localhost:9092
   jpa:
@@ -33,5 +33,6 @@ logging:
   level:
     root: INFO
     ru.practicum.analyzer: DEBUG
-#    org.hibernate.SQL: DEBUG
-#    org.hibernate.type.descriptor.sql: TRACE
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql: TRACE
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
