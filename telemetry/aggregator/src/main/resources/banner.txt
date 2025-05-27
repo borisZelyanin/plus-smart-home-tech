@@ -4,22 +4,17 @@ ${AnsiColor.BRIGHT_BLACK}  ███╔╝ ██║ ${AnsiColor.BRIGHT_GREEN}  
 ${AnsiColor.BRIGHT_BLACK} ███╔╝  ██║   ██║█${AnsiColor.BRIGHT_GREEN}█║     ██║   ██║ ██║     ██║   █${AnsiColor.BRIGHT_BLACK}█║██║  ██║██╔════╝
 ${AnsiColor.BRIGHT_BLACK}███████╗╚██████╔╝███████${AnsiColor.BRIGHT_GREEN}╗╚██████╔╝ ╚██████╗╚${AnsiColor.BRIGHT_BLACK}██████╔╝██████╔╝███████╗
 ${AnsiColor.BRIGHT_BLACK}╚══════╝ ╚═════╝ ╚══════╝ ╚═══${AnsiColor.BRIGHT_GREEN}══╝   ╚═${AnsiColor.BRIGHT_BLACK}════╝ ╚═════╝ ╚═════╝ ╚══════╝
-         (  )
-        (   )
-         | |
-        _|_|_         COLLECTOR SERVICE
-     __|     |__      Smart Home / Kafka / Avro
-    |  O     O  |
-    |    💡     |      Version: 1.0
-     \_______/        Powered by Spring Boot
-    📦 C O L L E C T O R   S E R V I C E
-  ———————————————————————————————————————————————
-  📬 Приёмник событий с хабов.
 
-  → Получает HubEvent из gRPC
-  → Конвертирует в Avro
-  → Отправляет в Kafka
+       📊 A G G R E G A T O R   S E R V I C E
+   ———————————————————————————————————————————————
+   🧠 Мозг-картограф умного дома.
+   Собирает, агрегирует и превращает
+   события в **живые снапшоты** состояния хаба.
 
-  "Всё, что происходит в хабе — он знает первым."
+   → Получает сообщения из Kafka
+   → Создаёт snapshot-объекты
+   → Отправляет их на анализ
 
+   "Telemetry goes in — state maps come out."
+   — Прямо как в NASA, но только дома 😎
 

@@ -4,22 +4,25 @@ ${AnsiColor.BRIGHT_BLACK}  ███╔╝ ██║ ${AnsiColor.BRIGHT_GREEN}  
 ${AnsiColor.BRIGHT_BLACK} ███╔╝  ██║   ██║█${AnsiColor.BRIGHT_GREEN}█║     ██║   ██║ ██║     ██║   █${AnsiColor.BRIGHT_BLACK}█║██║  ██║██╔════╝
 ${AnsiColor.BRIGHT_BLACK}███████╗╚██████╔╝███████${AnsiColor.BRIGHT_GREEN}╗╚██████╔╝ ╚██████╗╚${AnsiColor.BRIGHT_BLACK}██████╔╝██████╔╝███████╗
 ${AnsiColor.BRIGHT_BLACK}╚══════╝ ╚═════╝ ╚══════╝ ╚═══${AnsiColor.BRIGHT_GREEN}══╝   ╚═${AnsiColor.BRIGHT_BLACK}════╝ ╚═════╝ ╚═════╝ ╚══════╝
-         (  )
-        (   )
-         | |
-        _|_|_         COLLECTOR SERVICE
-     __|     |__      Smart Home / Kafka / Avro
-    |  O     O  |
-    |    💡     |      Version: 1.0
-     \_______/        Powered by Spring Boot
-    📦 C O L L E C T O R   S E R V I C E
-  ———————————————————————————————————————————————
-  📬 Приёмник событий с хабов.
+       .--.
+     .'_\/_'.
+     '. /\ .'
+       "||"
+         ||      ANALYZER
+         ||      Smart Home Monitor
+    __/  ||  \__
+   `----'  `----'     🦜 Monitoring with Precision
 
-  → Получает HubEvent из gRPC
-  → Конвертирует в Avro
-  → Отправляет в Kafka
+ :: Spring Boot Analyzer ::
 
-  "Всё, что происходит в хабе — он знает первым."
+      🦜 A N A L Y Z E R   S E R V I C E
+   ———————————————————————————————————————————————
+   🔎 Умный попугай-детектив.
 
+   → Получает снапшоты устройств из Kafka
+   → Проверяет условия сценариев из БД
+   → Отправляет команды через gRPC, если условия выполнены
+
+   "Если движение замечено и свет не горит —
+    попугай включает лампу. 🦜💡"
 
