@@ -43,7 +43,7 @@ public class EventController extends CollectorControllerGrpc.CollectorController
         try {
             SensorEventProto.PayloadCase payloadType = request.getPayloadCase();
             String json = JsonFormat.printer().includingDefaultValueFields().print(request);
-           // requestLog.log("SENSOR", payloadType.name(), json);
+            requestLog.log("SENSOR", payloadType.name(), request);
 
             log.debug("👨‍🦽 collectSensorEvent → {}", json);
 
@@ -54,6 +54,7 @@ public class EventController extends CollectorControllerGrpc.CollectorController
             sensorHandlers.get(payloadType).handle(request);
             responseObserver.onNext(Empty.getDefaultInstance());
             responseObserver.onCompleted();
+            requestLog.printSummary();
         } catch (Exception e) {
             responseObserver.onError(new StatusRuntimeException(
                     Status.INTERNAL.withDescription(e.getMessage()).withCause(e)
@@ -77,6 +78,7 @@ public class EventController extends CollectorControllerGrpc.CollectorController
             hubHandlers.get(payloadType).handle(request);
             responseObserver.onNext(Empty.getDefaultInstance());
             responseObserver.onCompleted();
+            requestLog.printSummary();
         } catch (Exception e) {
             responseObserver.onError(new StatusRuntimeException(
                     Status.INTERNAL.withDescription(e.getMessage()).withCause(e)
