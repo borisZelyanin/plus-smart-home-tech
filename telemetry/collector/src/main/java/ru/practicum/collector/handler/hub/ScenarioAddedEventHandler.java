@@ -2,14 +2,12 @@ package ru.practicum.collector.handler.hub;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
 import ru.practicum.collector.model.hub.*;
 import ru.practicum.collector.service.HubEventService;
 import ru.yandex.practicum.grpc.telemetry.event.HubEventProto;
 
 import java.time.Instant;
 import java.util.List;
-
 
 @Slf4j
 @Component
@@ -30,6 +28,8 @@ public class ScenarioAddedEventHandler implements HubEventHandler {
     public void handle(HubEventProto event) {
         var payload = event.getScenarioAddedOrBuilder();
 
+        log.info("📥 Обработка события SCENARIO_ADDED от хаба: {}, имя сценария: {}", event.getHubId(), payload.getName());
+
         // Конвертация условий
         List<ScenarioCondition> conditions = payload.getConditionList().stream()
                 .map(proto -> {
@@ -41,7 +41,11 @@ public class ScenarioAddedEventHandler implements HubEventHandler {
                     switch (proto.getValueCase()) {
                         case BOOL_VALUE -> condition.setValue(proto.getBoolValue());
                         case INT_VALUE -> condition.setValue(proto.getIntValue());
+                        default -> log.warn("⚠️ Неизвестный тип значения условия: {}", proto.getValueCase());
                     }
+
+                    log.debug("🔧 Условие: sensorId={}, type={}, operation={}, value={}",
+                            condition.getSensorId(), condition.getType(), condition.getOperation(), condition.getValue());
 
                     return condition;
                 })
@@ -56,6 +60,10 @@ public class ScenarioAddedEventHandler implements HubEventHandler {
                     if (proto.hasValue()) {
                         action.setValue(proto.getValue());
                     }
+
+                    log.debug("⚙️ Действие: sensorId={}, type={}, value={}",
+                            action.getSensorId(), action.getType(), action.getValue());
+
                     return action;
                 })
                 .toList();
@@ -73,8 +81,11 @@ public class ScenarioAddedEventHandler implements HubEventHandler {
                 event.getTimestamp().getNanos()
         ));
 
+        log.info("📤 Отправка сценария в HubEventService: {}, условий: {}, действий: {}",
+                converted.getName(), conditions.size(), actions.size());
+
         hubEventService.send(converted);
 
-        log.info("📡 Принято событие: Добавлен сценарий: {}", payload.getName());
+        log.info("✅ Сценарий '{}' от хаба '{}' успешно обработан и отправлен", converted.getName(), converted.getHubId());
     }
 }

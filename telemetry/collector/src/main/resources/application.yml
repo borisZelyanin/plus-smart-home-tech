@@ -29,14 +29,15 @@ logging:
         web: DEBUG
       io:
         grpc: DEBUG
+    ru.practicum.collector: TRACE
 
 grpc:
   server:
-    port: 59091
+    port: 59090
 
   client:
     echo:
-      address: 'static://127.0.0.1:59091'
+      address: 'static://127.0.0.1:59090'
       enableKeepAlive: true
       keepAliveWithoutCalls: true
       negotiationType: TLS
