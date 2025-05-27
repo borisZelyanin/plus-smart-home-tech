@@ -11,6 +11,7 @@
     </parent>
 
     <groupId>ru.yandex.practicum</groupId>
+
     <artifactId>smart-home-tech</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>

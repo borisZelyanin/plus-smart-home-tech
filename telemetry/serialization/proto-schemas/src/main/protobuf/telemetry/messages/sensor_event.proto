@@ -44,6 +44,7 @@ message ClimateSensorEvent {
 }
 
 
+
 message SwitchSensorEvent {
   bool state = 1; // состояние переключателя: включён/выключен
 }

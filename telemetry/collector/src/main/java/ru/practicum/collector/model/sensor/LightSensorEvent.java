@@ -6,6 +6,9 @@ import lombok.*;
 @Getter
 @Setter
 @ToString(callSuper = true)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Schema(description = "Показания датчика освещенности")
 public class LightSensorEvent extends SensorEvent {
     private int linkQuality;

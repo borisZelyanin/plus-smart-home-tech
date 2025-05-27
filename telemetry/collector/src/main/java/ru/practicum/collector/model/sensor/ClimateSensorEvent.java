@@ -7,6 +7,7 @@ import lombok.*;
 @Setter
 @ToString(callSuper = true)
 @Schema(description = "Показания климатического датчика")
+@Builder
 public class ClimateSensorEvent extends SensorEvent {
     private int temperatureC;
     private int humidity;

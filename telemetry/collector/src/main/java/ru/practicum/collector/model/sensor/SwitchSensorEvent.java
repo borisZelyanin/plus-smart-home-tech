@@ -7,6 +7,7 @@ import lombok.*;
 @Setter
 @ToString(callSuper = true)
 @Schema(description = "Показания переключателя")
+@Builder
 public class SwitchSensorEvent extends SensorEvent {
     private boolean state;
 

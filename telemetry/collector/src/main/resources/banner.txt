@@ -1,3 +1,9 @@
+${AnsiColor.BRIGHT_BLACK}${AnsiColor.BRIGHT_GREEN}███████╗██╗   ██╗██╗     ██╗   ██╗  ██████╗ ██████  ██████╗ ███████╗
+${AnsiColor.BRIGHT_BLACK}╚══███${AnsiColor.BRIGHT_GREEN}╔╝██║   ██║██║     ██║   ██║ ██╔════╝██╔═══██╗██╔══██╗██${AnsiColor.BRIGHT_BLACK}╔════╝
+${AnsiColor.BRIGHT_BLACK}  ███╔╝ ██║ ${AnsiColor.BRIGHT_GREEN}  ██║██║     ██║   ██║ ██║     ██║   ██║██║ ${AnsiColor.BRIGHT_BLACK} ██║███████╗
+${AnsiColor.BRIGHT_BLACK} ███╔╝  ██║   ██║█${AnsiColor.BRIGHT_GREEN}█║     ██║   ██║ ██║     ██║   █${AnsiColor.BRIGHT_BLACK}█║██║  ██║██╔════╝
+${AnsiColor.BRIGHT_BLACK}███████╗╚██████╔╝███████${AnsiColor.BRIGHT_GREEN}╗╚██████╔╝ ╚██████╗╚${AnsiColor.BRIGHT_BLACK}██████╔╝██████╔╝███████╗
+${AnsiColor.BRIGHT_BLACK}╚══════╝ ╚═════╝ ╚══════╝ ╚═══${AnsiColor.BRIGHT_GREEN}══╝   ╚═${AnsiColor.BRIGHT_BLACK}════╝ ╚═════╝ ╚═════╝ ╚══════╝
          (  )
         (   )
          | |
@@ -6,3 +12,14 @@
     |  O     O  |
     |    💡     |      Version: 1.0
      \_______/        Powered by Spring Boot
+    📦 C O L L E C T O R   S E R V I C E
+  ———————————————————————————————————————————————
+  📬 Приёмник событий с хабов.
+
+  → Получает HubEvent из gRPC
+  → Конвертирует в Avro
+  → Отправляет в Kafka
+
+  "Всё, что происходит в хабе — он знает первым."
+
+
