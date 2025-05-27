@@ -137,52 +137,47 @@ public class ScenarioEvaluator {
 
     private Function<SensorEventWrapper, Integer> extractValue(Condition condition) {
         return event -> {
-            Object data = event.getData();
+            Object raw = event.getData();
             String sensorId = event.getId();
 
             try {
+                // 🟡 Попытка извлечь payload из SensorStateAvro
+                if (!(raw instanceof SensorStateAvro state)) {
+                    log.warn("⚠ Ожидался SensorStateAvro, но получен: {}", raw.getClass().getSimpleName());
+                    return -1;
+                }
+
+                Object data = state.getData();
+
                 return switch (condition.getType()) {
                     case MOTION -> {
-                        if (data instanceof MotionSensorAvro motion) {
-                            yield motion.getMotion() ? 1 : 0;
-                        }
+                        if (data instanceof MotionSensorAvro motion) yield motion.getMotion() ? 1 : 0;
                         log.warn("⚠ Ожидался MotionSensorAvro для сенсора '{}', получено: {}", sensorId, data.getClass().getSimpleName());
                         yield -1;
                     }
                     case LUMINOSITY -> {
-                        if (data instanceof LightSensorAvro light) {
-                            yield light.getLuminosity();
-                        }
+                        if (data instanceof LightSensorAvro light) yield light.getLuminosity();
                         log.warn("⚠ Ожидался LightSensorAvro для сенсора '{}', получено: {}", sensorId, data.getClass().getSimpleName());
                         yield -1;
                     }
                     case SWITCH -> {
-                        if (data instanceof SwitchSensorAvro sw) {
-                            yield sw.getState() ? 1 : 0;
-                        }
+                        if (data instanceof SwitchSensorAvro sw) yield sw.getState() ? 1 : 0;
                         log.warn("⚠ Ожидался SwitchSensorAvro для сенсора '{}', получено: {}", sensorId, data.getClass().getSimpleName());
                         yield -1;
                     }
                     case TEMPERATURE -> {
-                        if (data instanceof ClimateSensorAvro climate) {
-                            yield climate.getTemperatureC();
-                        } else if (data instanceof TemperatureSensorAvro temp) {
-                            yield temp.getTemperatureC();
-                        }
+                        if (data instanceof ClimateSensorAvro climate) yield climate.getTemperatureC();
+                        if (data instanceof TemperatureSensorAvro temp) yield temp.getTemperatureC();
                         log.warn("⚠ Не удалось извлечь TEMPERATURE для сенсора '{}'. Тип данных: {}", sensorId, data.getClass().getSimpleName());
                         yield -1;
                     }
                     case CO2LEVEL -> {
-                        if (data instanceof ClimateSensorAvro climate) {
-                            yield climate.getCo2Level();
-                        }
+                        if (data instanceof ClimateSensorAvro climate) yield climate.getCo2Level();
                         log.warn("⚠ Ожидался ClimateSensorAvro для CO2LEVEL, сенсор '{}', получено: {}", sensorId, data.getClass().getSimpleName());
                         yield -1;
                     }
                     case HUMIDITY -> {
-                        if (data instanceof ClimateSensorAvro climate) {
-                            yield climate.getHumidity();
-                        }
+                        if (data instanceof ClimateSensorAvro climate) yield climate.getHumidity();
                         log.warn("⚠ Ожидался ClimateSensorAvro для HUMIDITY, сенсор '{}', получено: {}", sensorId, data.getClass().getSimpleName());
                         yield -1;
                     }
