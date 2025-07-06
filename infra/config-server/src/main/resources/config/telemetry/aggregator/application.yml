@@ -1,0 +1,16 @@
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: aggregator-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: ru.practicum.aggregator.kafka.SensorEventDeserializer
+      auto-offset-reset: earliest
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: ru.practicum.aggregator.kafka.GeneralKafkaSerializer
+      #value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+
+aggregator:
+  input-topic: telemetry.sensors.v1
+  output-topic: telemetry.snapshots.v1
