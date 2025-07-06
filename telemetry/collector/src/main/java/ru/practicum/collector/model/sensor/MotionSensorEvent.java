@@ -6,6 +6,7 @@ import lombok.*;
 @Getter
 @Setter
 @ToString(callSuper = true)
+@Builder
 @Schema(description = "Показания датчика движения")
 public class MotionSensorEvent extends SensorEvent {
     private int linkQuality;

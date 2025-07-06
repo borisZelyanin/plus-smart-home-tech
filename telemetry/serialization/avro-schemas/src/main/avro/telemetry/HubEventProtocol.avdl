@@ -51,7 +51,7 @@ protocol HubEventProtocol {
 
   record HubEventAvro {
     string hub_id;
-    long timestamp; // logicalType: timestamp-millis
+    timestamp_ms timestamp; // logicalType: timestamp-millis
     union { DeviceAddedEventAvro, DeviceRemovedEventAvro, ScenarioAddedEventAvro, ScenarioRemovedEventAvro } payload;
   }
 }

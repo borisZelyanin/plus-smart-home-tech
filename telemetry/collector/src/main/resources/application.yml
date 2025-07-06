@@ -27,6 +27,20 @@ logging:
       springframework:
         kafka: DEBUG
         web: DEBUG
+      io:
+        grpc: DEBUG
+    ru.practicum.collector: TRACE
+
+grpc:
+  server:
+    port: 59090
+
+  client:
+    echo:
+      address: 'static://127.0.0.1:59090'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: TLS
 
 springdoc:
   api-docs:

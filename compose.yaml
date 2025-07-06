@@ -4,8 +4,8 @@ services:
     hostname: kafka
     container_name: kafka
     ports:
-      - "9092:9092" # for client connections
-      - "9101:9101" # JMX
+      - "9092:9092"
+      - "9101:9101"
       - "29092:29092"
     restart: unless-stopped
     environment:
@@ -34,6 +34,7 @@ services:
                              --partitions 1 --replication-factor 1 --if-not-exists \
                              --bootstrap-server kafka:29092'"
     init: true
+
   kafka-ui:
     container_name: kafka-ui
     hostname: kafka-ui
@@ -43,5 +44,14 @@ services:
     environment:
       DYNAMIC_CONFIG_ENABLED: 'true'
       KAFKA_CLUSTERS_0_NAME: wizard_test
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:2909
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
 
+  db:
+    image: postgres:16.1
+    container_name: smart-home-db
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=pass
+      - POSTGRES_USER=user
+      - POSTGRES_DB=smart

@@ -1,0 +1,28 @@
+${AnsiColor.BRIGHT_BLACK}${AnsiColor.BRIGHT_GREEN}███████╗██╗   ██╗██╗     ██╗   ██╗  ██████╗ ██████  ██████╗ ███████╗
+${AnsiColor.BRIGHT_BLACK}╚══███${AnsiColor.BRIGHT_GREEN}╔╝██║   ██║██║     ██║   ██║ ██╔════╝██╔═══██╗██╔══██╗██${AnsiColor.BRIGHT_BLACK}╔════╝
+${AnsiColor.BRIGHT_BLACK}  ███╔╝ ██║ ${AnsiColor.BRIGHT_GREEN}  ██║██║     ██║   ██║ ██║     ██║   ██║██║ ${AnsiColor.BRIGHT_BLACK} ██║███████╗
+${AnsiColor.BRIGHT_BLACK} ███╔╝  ██║   ██║█${AnsiColor.BRIGHT_GREEN}█║     ██║   ██║ ██║     ██║   █${AnsiColor.BRIGHT_BLACK}█║██║  ██║██╔════╝
+${AnsiColor.BRIGHT_BLACK}███████╗╚██████╔╝███████${AnsiColor.BRIGHT_GREEN}╗╚██████╔╝ ╚██████╗╚${AnsiColor.BRIGHT_BLACK}██████╔╝██████╔╝███████╗
+${AnsiColor.BRIGHT_BLACK}╚══════╝ ╚═════╝ ╚══════╝ ╚═══${AnsiColor.BRIGHT_GREEN}══╝   ╚═${AnsiColor.BRIGHT_BLACK}════╝ ╚═════╝ ╚═════╝ ╚══════╝
+       .--.
+     .'_\/_'.
+     '. /\ .'
+       "||"
+         ||      ANALYZER
+         ||      Smart Home Monitor
+    __/  ||  \__
+   `----'  `----'     🦜 Monitoring with Precision
+
+ :: Spring Boot Analyzer ::
+
+      🦜 A N A L Y Z E R   S E R V I C E
+   ———————————————————————————————————————————————
+   🔎 Умный попугай-детектив.
+
+   → Получает снапшоты устройств из Kafka
+   → Проверяет условия сценариев из БД
+   → Отправляет команды через gRPC, если условия выполнены
+
+   "Если движение замечено и свет не горит —
+    попугай включает лампу. 🦜💡"
+

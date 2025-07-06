@@ -1,0 +1,20 @@
+${AnsiColor.BRIGHT_BLACK}${AnsiColor.BRIGHT_GREEN}███████╗██╗   ██╗██╗     ██╗   ██╗  ██████╗ ██████  ██████╗ ███████╗
+${AnsiColor.BRIGHT_BLACK}╚══███${AnsiColor.BRIGHT_GREEN}╔╝██║   ██║██║     ██║   ██║ ██╔════╝██╔═══██╗██╔══██╗██${AnsiColor.BRIGHT_BLACK}╔════╝
+${AnsiColor.BRIGHT_BLACK}  ███╔╝ ██║ ${AnsiColor.BRIGHT_GREEN}  ██║██║     ██║   ██║ ██║     ██║   ██║██║ ${AnsiColor.BRIGHT_BLACK} ██║███████╗
+${AnsiColor.BRIGHT_BLACK} ███╔╝  ██║   ██║█${AnsiColor.BRIGHT_GREEN}█║     ██║   ██║ ██║     ██║   █${AnsiColor.BRIGHT_BLACK}█║██║  ██║██╔════╝
+${AnsiColor.BRIGHT_BLACK}███████╗╚██████╔╝███████${AnsiColor.BRIGHT_GREEN}╗╚██████╔╝ ╚██████╗╚${AnsiColor.BRIGHT_BLACK}██████╔╝██████╔╝███████╗
+${AnsiColor.BRIGHT_BLACK}╚══════╝ ╚═════╝ ╚══════╝ ╚═══${AnsiColor.BRIGHT_GREEN}══╝   ╚═${AnsiColor.BRIGHT_BLACK}════╝ ╚═════╝ ╚═════╝ ╚══════╝
+
+       📊 A G G R E G A T O R   S E R V I C E
+   ———————————————————————————————————————————————
+   🧠 Мозг-картограф умного дома.
+   Собирает, агрегирует и превращает
+   события в **живые снапшоты** состояния хаба.
+
+   → Получает сообщения из Kafka
+   → Создаёт snapshot-объекты
+   → Отправляет их на анализ
+
+   "Telemetry goes in — state maps come out."
+   — Прямо как в NASA, но только дома 😎
+
