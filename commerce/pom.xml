@@ -11,5 +11,12 @@
 
     <artifactId>commerce</artifactId>
     <packaging>pom</packaging>
+    <modules>
+        <module>warehouse</module>
+        <module>interaction-api</module>
+        <module>shopping-store</module>
+        <module>shopping-cart</module>
+    </modules>
+
 
 </project>
