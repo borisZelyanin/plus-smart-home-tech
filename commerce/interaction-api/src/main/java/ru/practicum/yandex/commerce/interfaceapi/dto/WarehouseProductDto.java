@@ -1,6 +1,5 @@
-package ru.practicum.yandex.commerce.warehouse.model;
+package ru.practicum.yandex.commerce.interfaceapi.dto;
 
-import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.UUID;
@@ -9,13 +8,8 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "products", schema = "warehouse")
-public class Product {
-    @Id
-    @Column(name = "product_id")
+public class WarehouseProductDto {
     private UUID productId;
-
     private double width;
     private double height;
     private double depth;

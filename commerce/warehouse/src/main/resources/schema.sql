@@ -2,7 +2,7 @@
 CREATE SCHEMA IF NOT EXISTS warehouse;
 
 -- Таблица продуктов
-CREATE TABLE warehouse.products (
+CREATE TABLE IF NOT EXISTS warehouse.products (
     product_id UUID PRIMARY KEY,
     width DOUBLE PRECISION NOT NULL CHECK (width >= 1),
     height DOUBLE PRECISION NOT NULL CHECK (height >= 1),
@@ -12,13 +12,13 @@ CREATE TABLE warehouse.products (
 );
 
 -- Таблица остатков товаров на складе
-CREATE TABLE warehouse.warehouse_stock (
+CREATE TABLE IF NOT EXISTS warehouse.warehouse_stock (
     product_id UUID PRIMARY KEY REFERENCES warehouse.products(product_id) ON DELETE CASCADE,
     quantity BIGINT NOT NULL CHECK (quantity >= 0)
 );
 
--- Таблица адреса склада (если один склад — одна запись)
-CREATE TABLE warehouse.warehouse_address (
+-- Таблица адреса склада
+CREATE TABLE IF NOT EXISTS warehouse.warehouse_address (
     id SERIAL PRIMARY KEY,
     country VARCHAR(255) NOT NULL,
     city VARCHAR(255) NOT NULL,

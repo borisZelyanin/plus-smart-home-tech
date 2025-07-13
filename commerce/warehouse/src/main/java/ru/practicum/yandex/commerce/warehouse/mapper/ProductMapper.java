@@ -1,35 +1,31 @@
 package ru.practicum.yandex.commerce.warehouse.mapper;
 
 import org.springframework.stereotype.Component;
-import ru.practicum.yandex.commerce.interfaceapi.dto.ProductDto;
+import ru.practicum.yandex.commerce.interfaceapi.dto.WarehouseProductDto;
 import ru.practicum.yandex.commerce.warehouse.model.Product;
 
 @Component
 public class ProductMapper {
 
-    public ProductDto toDto(Product entity) {
-        return ProductDto.builder()
+    public WarehouseProductDto toDto(Product entity) {
+        return WarehouseProductDto.builder()
                 .productId(entity.getProductId())
-                .productName(entity.getProductName())
-                .description(entity.getDescription())
-                .imageSrc(entity.getImageSrc())
-                .price(entity.getPrice())
-                .productCategory(entity.getProductCategory())
-                .productState(entity.getProductState())
-                .quantityState(entity.getQuantityState())
+                .width(entity.getWidth())
+                .height(entity.getHeight())
+                .depth(entity.getDepth())
+                .weight(entity.getWeight())
+                .fragile(entity.isFragile())
                 .build();
     }
 
-    public Product toEntity(ProductDto dto) {
+    public Product toEntity(WarehouseProductDto dto) {
         return Product.builder()
                 .productId(dto.getProductId())
-                .productName(dto.getProductName())
-                .description(dto.getDescription())
-                .imageSrc(dto.getImageSrc())
-                .price(dto.getPrice())
-                .productCategory(dto.getProductCategory())
-                .productState(dto.getProductState())
-                .quantityState(dto.getQuantityState())
+                .width(dto.getWidth())
+                .height(dto.getHeight())
+                .depth(dto.getDepth())
+                .weight(dto.getWeight())
+                .fragile(dto.isFragile())
                 .build();
     }
 }
