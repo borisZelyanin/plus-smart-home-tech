@@ -1,8 +1,9 @@
-package ru.practicum.yandex.commerce.interfaceapi.dto;
+package ru.practicum.yandex.commerce.interfaceapi.dto.shopping.store.Feign;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.practicum.yandex.commerce.interfaceapi.dto.shopping.store.QuantityState;
 
 import java.util.UUID;
 

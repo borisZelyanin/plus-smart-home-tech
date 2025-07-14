@@ -1,7 +1,7 @@
 package ru.practicum.yandex.shopping.store.mapper;
 
 import org.springframework.stereotype.Component;
-import ru.practicum.yandex.commerce.interfaceapi.dto.ProductDto;
+import ru.practicum.yandex.commerce.interfaceapi.dto.shopping.store.ProductDto;
 import ru.practicum.yandex.shopping.store.model.Product;
 
 @Component

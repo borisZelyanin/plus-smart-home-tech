@@ -1,4 +1,4 @@
-package ru.practicum.yandex.commerce.interfaceapi.dto;
+package ru.practicum.yandex.commerce.interfaceapi.dto.warehose.Feign;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

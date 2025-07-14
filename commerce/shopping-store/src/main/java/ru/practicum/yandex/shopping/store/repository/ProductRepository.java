@@ -7,9 +7,9 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import ru.practicum.yandex.commerce.interfaceapi.dto.ProductCategory;
-import ru.practicum.yandex.commerce.interfaceapi.dto.ProductState;
-import ru.practicum.yandex.commerce.interfaceapi.dto.QuantityState;
+import ru.practicum.yandex.commerce.interfaceapi.dto.shopping.store.ProductCategory;
+import ru.practicum.yandex.commerce.interfaceapi.dto.shopping.store.ProductState;
+import ru.practicum.yandex.commerce.interfaceapi.dto.shopping.store.QuantityState;
 import ru.practicum.yandex.shopping.store.model.Product;
 
 import java.util.UUID;

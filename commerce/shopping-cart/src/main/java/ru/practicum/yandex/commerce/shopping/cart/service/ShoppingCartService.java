@@ -1,11 +1,10 @@
 package ru.practicum.yandex.commerce.shopping.cart.service;
 
-import ru.practicum.yandex.commerce.interfaceapi.dto.ChangeProductQuantityRequest;
-import ru.practicum.yandex.commerce.interfaceapi.dto.ShoppingCartDto;
+import ru.practicum.yandex.commerce.interfaceapi.dto.warehose.Feign.ChangeProductQuantityRequest;
+import ru.practicum.yandex.commerce.interfaceapi.dto.shopping.cart.ShoppingCartDto;
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 public interface ShoppingCartService {
     ShoppingCartDto getCart(String username);

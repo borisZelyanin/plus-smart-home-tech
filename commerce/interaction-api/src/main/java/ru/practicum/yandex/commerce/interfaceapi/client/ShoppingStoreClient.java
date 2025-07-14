@@ -2,8 +2,8 @@ package ru.practicum.yandex.commerce.interfaceapi.client;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.yandex.commerce.interfaceapi.dto.ProductDto;
-import ru.practicum.yandex.commerce.interfaceapi.dto.SetProductQuantityStateRequest;
+import ru.practicum.yandex.commerce.interfaceapi.dto.shopping.store.ProductDto;
+import ru.practicum.yandex.commerce.interfaceapi.dto.shopping.store.Feign.SetProductQuantityStateRequest;
 
 import java.util.List;
 import java.util.UUID;

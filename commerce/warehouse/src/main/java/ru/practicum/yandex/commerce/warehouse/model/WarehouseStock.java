@@ -7,21 +7,21 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "warehouse_stock", schema = "warehouse")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class WarehouseStock {
 
     @Id
-    @Column(name = "product_id")
     private UUID productId;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @MapsId
-    @JoinColumn(name = "product_id")
-    private Product product;
+    @JoinColumn(name = "product_id", nullable = false)
+    private WarehouseProduct product;
 
     @Column(nullable = false)
-    private long quantity;
+    private Long quantity;
 }

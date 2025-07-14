@@ -1,15 +1,22 @@
 package ru.practicum.yandex.commerce.warehouse.mapper;
 
 import org.springframework.stereotype.Component;
-import ru.practicum.yandex.commerce.interfaceapi.dto.WarehouseStockDto;
+import ru.practicum.yandex.commerce.interfaceapi.dto.warehose.WarehouseStockDto;
+import ru.practicum.yandex.commerce.warehouse.model.WarehouseProduct;
 import ru.practicum.yandex.commerce.warehouse.model.WarehouseStock;
 
 @Component
 public class WarehouseStockMapper {
+
     public WarehouseStockDto toDto(WarehouseStock entity) {
-        WarehouseStockDto dto = new WarehouseStockDto();
-        dto.setProductId(entity.getProduct().getProductId());
-        dto.setQuantity(entity.getQuantity());
-        return dto;
+        return new WarehouseStockDto(entity.getProductId(), entity.getQuantity());
+    }
+
+    public WarehouseStock toEntity(WarehouseStockDto dto, WarehouseProduct product) {
+        return WarehouseStock.builder()
+                .productId(dto.getProductId())
+                .product(product)
+                .quantity(dto.getQuantity())
+                .build();
     }
 }
