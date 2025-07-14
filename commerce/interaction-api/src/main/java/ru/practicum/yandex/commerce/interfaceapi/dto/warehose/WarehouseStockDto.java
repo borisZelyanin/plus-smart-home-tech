@@ -9,7 +9,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 public class WarehouseStockDto {
-
+    private boolean isNew;
+    private String message;
     private UUID productId;
     private long quantity;
 }

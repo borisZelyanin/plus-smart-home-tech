@@ -17,6 +17,6 @@ public interface WarehouseService {
 
     Optional<WarehouseStockDto> getStockByProductId(UUID productId);
 
-    boolean addStock(WarehouseStockDto request);
+    WarehouseStockDto addStock(WarehouseStockDto request);
 
 }

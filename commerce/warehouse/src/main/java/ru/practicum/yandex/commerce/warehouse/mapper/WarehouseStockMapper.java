@@ -9,7 +9,7 @@ import ru.practicum.yandex.commerce.warehouse.model.WarehouseStock;
 public class WarehouseStockMapper {
 
     public WarehouseStockDto toDto(WarehouseStock entity) {
-        return new WarehouseStockDto(entity.getProductId(), entity.getQuantity());
+        return new WarehouseStockDto(false, null, entity.getProductId(), entity.getQuantity());
     }
 
     public WarehouseStock toEntity(WarehouseStockDto dto, WarehouseProduct product) {

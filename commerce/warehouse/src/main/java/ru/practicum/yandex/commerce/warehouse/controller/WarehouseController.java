@@ -27,11 +27,8 @@ public class WarehouseController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<String> addStock(@RequestBody WarehouseStockDto request) {
-        boolean result = service.addStock(request);
-        return result
-                ? ResponseEntity.ok("Stock added")
-                : ResponseEntity.badRequest().body("Product already exists in warehouse stock");
+    public ResponseEntity<WarehouseStockDto> addStock(@RequestBody WarehouseStockDto request) {
+        return ResponseEntity.ok(service.addStock(request));
     }
 
 }

@@ -47,25 +47,40 @@ public class WarehouseServiceImpl implements WarehouseService {
 
     @Override
     @Transactional
-    public boolean addStock(WarehouseStockDto request) {
+    public WarehouseStockDto addStock(WarehouseStockDto request) {
         UUID productId = request.getProductId();
 
-        // Проверка: есть ли уже остатки
-        if (warehouseStockRepository.existsByProduct_ProductId(productId)) {
-            throw new SpecifiedProductAlreadyInWarehouseException("Остатки уже существуют для товара: " + productId);
+        if (!productRepository.existsById(productId)) {
+            throw new ProductNotFoundException("Товар с ID " + productId + " не найден в таблице products");
         }
 
-        // Проверка: есть ли такой продукт
-        WarehouseProduct product = productRepository.findById(productId)
-                .orElseThrow(() -> new ProductNotFoundException("Продукт не найден: " + productId));
+        WarehouseStock stock = warehouseStockRepository.findByProduct_ProductId(productId).orElse(null);
 
-        // Создание новой записи об остатках
-        WarehouseStock stock = new WarehouseStock();
-        stock.setProduct(product);
-        stock.setQuantity(request.getQuantity());
-
-        warehouseStockRepository.save(stock);
-        return true;
+        if (stock == null) {
+            // Проверка: есть ли такой продукт
+            WarehouseProduct product = productRepository.findById(productId)
+                    .orElseThrow(() -> new ProductNotFoundException("Продукт не найден: " + productId));
+            WarehouseStock newStock = new WarehouseStock();
+            newStock.setProduct(product);
+            newStock.setQuantity(request.getQuantity());
+            warehouseStockRepository.save(newStock);
+            return WarehouseStockDto.builder()
+                    .productId(request.getProductId())
+                    .quantity(request.getQuantity())
+                    .isNew(false)
+                    .message("Количество товара на складе")
+                    .build();
+        } else {
+            long newQuantity = stock.getQuantity() + request.getQuantity();
+            stock.setQuantity(newQuantity);
+            warehouseStockRepository.save(stock);
+            return WarehouseStockDto.builder()
+                    .productId(request.getProductId())
+                    .quantity(request.getQuantity())
+                    .isNew(false)
+                    .message("Количество товара на складе")
+                    .build();
+        }
     }
 
     @Override
