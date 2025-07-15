@@ -8,6 +8,9 @@ import ru.practicum.yandex.commerce.interfaceapi.dto.warehose.WarehouseAddressDt
 import ru.practicum.yandex.commerce.interfaceapi.dto.warehose.WarehouseStockDto;
 import ru.practicum.yandex.commerce.warehouse.service.WarehouseService;
 
+import java.util.Map;
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/v1/warehouse")
 @RequiredArgsConstructor
@@ -29,6 +32,12 @@ public class WarehouseController {
     @PostMapping("/add")
     public ResponseEntity<WarehouseStockDto> addStock(@RequestBody WarehouseStockDto request) {
         return ResponseEntity.ok(service.addStock(request));
+    }
+
+    @PostMapping("/check")
+    public ResponseEntity<Map<UUID, Boolean>> checkProducts(@RequestBody Map<UUID, Integer> productList) {
+        Map<UUID, Boolean> result = service.checkProductsAvailability(productList);
+        return ResponseEntity.ok(result);
     }
 
 }

@@ -4,6 +4,7 @@ import ru.practicum.yandex.commerce.interfaceapi.dto.warehose.NewProductInWareho
 import ru.practicum.yandex.commerce.interfaceapi.dto.warehose.WarehouseAddressDto;
 import ru.practicum.yandex.commerce.interfaceapi.dto.warehose.WarehouseStockDto;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -18,5 +19,7 @@ public interface WarehouseService {
     Optional<WarehouseStockDto> getStockByProductId(UUID productId);
 
     WarehouseStockDto addStock(WarehouseStockDto request);
+
+    Map<UUID, Boolean> checkProductsAvailability(Map<UUID, Integer> productList);
 
 }

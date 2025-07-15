@@ -17,6 +17,8 @@ import ru.practicum.yandex.commerce.warehouse.repository.WarehouseAddressReposit
 import ru.practicum.yandex.commerce.warehouse.repository.WarehouseStockRepository;
 
 import java.security.SecureRandom;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -95,6 +97,23 @@ public class WarehouseServiceImpl implements WarehouseService {
 
 
         productRepository.save(product);
+    }
+
+    @Override
+    public Map<UUID, Boolean> checkProductsAvailability(Map<UUID, Integer> productList) {
+        Map<UUID, Boolean> result = new HashMap<>();
+
+        for (Map.Entry<UUID, Integer> entry : productList.entrySet()) {
+            UUID productId = entry.getKey();
+            int requiredQuantity = entry.getValue();
+
+            Optional<WarehouseStock> stockOpt = warehouseStockRepository.findByProduct_ProductId(productId);
+            boolean isAvailable = stockOpt.map(stock -> stock.getQuantity() >= requiredQuantity).orElse(false);
+
+            result.put(productId, isAvailable);
+        }
+
+        return result;
     }
 
     @Override

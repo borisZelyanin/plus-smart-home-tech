@@ -3,8 +3,11 @@ package ru.practicum.yandex.commerce.shopping.cart.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.yandex.commerce.interfaceapi.client.WarehouseClient;
 import ru.practicum.yandex.commerce.interfaceapi.dto.warehose.Feign.ChangeProductQuantityRequest;
 import ru.practicum.yandex.commerce.interfaceapi.dto.shopping.cart.ShoppingCartDto;
+import ru.practicum.yandex.commerce.interfaceapi.exception.shopping.cart.NotEnoughStockException;
+import ru.practicum.yandex.commerce.interfaceapi.exception.shopping.cart.ShoppingCartNotFoundException;
 import ru.practicum.yandex.commerce.shopping.cart.mapper.ShoppingCartMapper;
 import ru.practicum.yandex.commerce.shopping.cart.model.ShoppingCart;
 import ru.practicum.yandex.commerce.shopping.cart.repository.ShoppingCartRepository;
@@ -19,6 +22,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     private final ShoppingCartRepository repository;
     private final ShoppingCartMapper mapper;
+    private final WarehouseClient warehouseClient;
 
     @Override
     public ShoppingCartDto getCart(String username) {
@@ -35,18 +39,38 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     @Override
     public ShoppingCartDto addProducts(String username, Map<String, Long> productIdToQuantity) {
+        // Преобразуем ключи в UUID
+        Map<UUID, Integer> productCheckRequest = productIdToQuantity.entrySet().stream()
+                .collect(Collectors.toMap(
+                        e -> UUID.fromString(e.getKey()),
+                        e -> e.getValue().intValue()
+                ));
+
+        // Проверяем наличие на складе
+        Map<UUID, Boolean> availabilityMap = warehouseClient.checkProducts(productCheckRequest);
+
+        // Получаем или создаём корзину
         ShoppingCart cart = repository.findByUsername(username)
-                .orElseGet(() -> repository.save(ShoppingCart.builder()
-                        .username(username)
-                        .products(new HashMap<>())
-                        .build()));
+                .orElseGet(() -> repository.save(
+                        ShoppingCart.builder()
+                                .username(username)
+                                .products(new HashMap<>())
+                                .build()
+                ));
 
-        Map<UUID, Long> products = cart.getProducts();
-        productIdToQuantity.forEach((id, qty) -> {
-            UUID uuid = UUID.fromString(id);
-            products.put(uuid, products.getOrDefault(uuid, 0L) + qty);
-        });
+        Map<UUID, Long> cartProducts = cart.getProducts();
 
+        // Добавляем только доступные товары
+        for (Map.Entry<String, Long> entry : productIdToQuantity.entrySet()) {
+            UUID productId = UUID.fromString(entry.getKey());
+            Long qty = entry.getValue();
+
+            if (availabilityMap.getOrDefault(productId, false)) {
+                cartProducts.put(productId, cartProducts.getOrDefault(productId, 0L) + qty);
+            }
+        }
+
+        // Сохраняем и возвращаем
         return mapper.toDto(repository.save(cart));
     }
 
