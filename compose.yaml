@@ -55,3 +55,14 @@ services:
       - POSTGRES_PASSWORD=pass
       - POSTGRES_USER=user
       - POSTGRES_DB=smart
+
+  db-shopping-store:
+    image: postgres:16.1
+    container_name: shopping_store
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_PASSWORD=pass
+      - POSTGRES_USER=user
+      - POSTGRES_DB=shopping_store
+

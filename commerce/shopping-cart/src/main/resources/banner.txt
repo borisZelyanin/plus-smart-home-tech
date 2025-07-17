@@ -1,0 +1,17 @@
+${AnsiColor.BRIGHT_BLACK}${AnsiColor.BRIGHT_WHITE} ██████╗██╗  ██╗ ██████  ██████╗ ██████╗ ██╗███╗   ██╗ ██████╗   ██████╗ █████╗ ██████╗ ████████╗
+${AnsiColor.BRIGHT_BLACK}██╔═══${AnsiColor.BRIGHT_WHITE}═╝██║  ██║██╔═══██╗██╔══██╗██╔══██╗██║████╗  ██║██╔════╝  ██╔════╝██╔══██╗██╔══██╗╚══${AnsiColor.BRIGHT_BLACK}██╔══╝
+${AnsiColor.BRIGHT_BLACK}███████╗████${AnsiColor.BRIGHT_WHITE}███║██║   ██║██████╔╝██████╔╝██║██╔██╗ ██║██║  ███╗ ██║     ███████║█████${AnsiColor.BRIGHT_BLACK}█╔╝   ██║
+${AnsiColor.BRIGHT_BLACK}╚════██║██╔══██║██${AnsiColor.BRIGHT_WHITE}║   ██║██╔═══╝ ██╔═══╝ ██║██║╚██╗██║██║   ██║ ██║     ██╔══██${AnsiColor.BRIGHT_BLACK}║██╔══██╗   ██║
+${AnsiColor.BRIGHT_BLACK}██████╔╝██║  ██║╚██████╔${AnsiColor.BRIGHT_WHITE}╝██║     ██║     ██║██║ ╚████║╚██████╔╝ ╚██████╗█${AnsiColor.BRIGHT_BLACK}█║  ██║██║  ██║   ██║
+${AnsiColor.BRIGHT_BLACK}╚═════╝ ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ${AnsiColor.BRIGHT_WHITE}   ╚═╝     ╚═╝╚═╝  ╚═══╝ ╚═════╝   ╚═${AnsiColor.BRIGHT_BLACK}════╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝
+
+
+ :: Smart Home Technologies :: Shopping Cart Service
+────────────────────────────────────────────
+ ➤ Version    : ${project.version}
+ ➤ Artifact   : ${project.artifactId}
+ ➤ Git Hash   : ${git.commit.id.abbrev}
+ ➤ Java       : ${java.version}
+ ➤ SpringBoot : ${spring-boot.version}
+ ➤ Started at : ${startup.date}
+────────────────────────────────────────────
