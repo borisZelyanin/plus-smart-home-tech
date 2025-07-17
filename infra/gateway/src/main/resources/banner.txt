@@ -1,0 +1,6 @@
+${AnsiColor.BRIGHT_BLACK}${AnsiColor.BRIGHT_WHITE} ██████╗  █████╗ ████████╗███████╗██╗    ██╗ █████╗ ██╗   ██╗
+${AnsiColor.BRIGHT_BLACK}██╔═══${AnsiColor.BRIGHT_WHITE}═╝ ██╔══██╗╚══██╔══╝██╔════╝██║    ██║██╔══██╗╚██${AnsiColor.BRIGHT_BLACK}╗ ██╔╝
+${AnsiColor.BRIGHT_BLACK}██║  ███╗███${AnsiColor.BRIGHT_WHITE}████║   ██║   ███████╗██║ █╗ ██║█████${AnsiColor.BRIGHT_BLACK}██║ ╚████╔╝
+${AnsiColor.BRIGHT_BLACK}██║   ██║██╔══██║ ${AnsiColor.BRIGHT_WHITE}  ██║   ██╔════╝██║███╗██${AnsiColor.BRIGHT_BLACK}║██╔══██║  ╚██╔╝
+${AnsiColor.BRIGHT_BLACK}╚██████╔╝██║  ██║   ██║ ${AnsiColor.BRIGHT_WHITE}  ███████╗╚██${AnsiColor.BRIGHT_BLACK}█╔███╔╝██║  ██║   ██║
+${AnsiColor.BRIGHT_BLACK} ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═══${AnsiColor.BRIGHT_WHITE}═${AnsiColor.BRIGHT_BLACK}══╝ ╚══╝╚══╝ ╚═╝  ╚═╝   ╚═╝
