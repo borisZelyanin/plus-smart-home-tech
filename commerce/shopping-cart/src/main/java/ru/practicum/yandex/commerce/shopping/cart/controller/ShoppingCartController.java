@@ -3,8 +3,8 @@ package ru.practicum.yandex.commerce.shopping.cart.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.yandex.commerce.interfaceapi.dto.warehose.Feign.ChangeProductQuantityRequest;
-import ru.practicum.yandex.commerce.interfaceapi.dto.shopping.cart.ShoppingCartDto;
+import ru.practicum.yandex.commerce.delivery.interfaceapi.dto.warehose.Feign.ChangeProductQuantityRequest;
+import ru.practicum.yandex.commerce.delivery.interfaceapi.dto.shopping.cart.ShoppingCartDto;
 import ru.practicum.yandex.commerce.shopping.cart.service.ShoppingCartService;
 
 import java.util.List;

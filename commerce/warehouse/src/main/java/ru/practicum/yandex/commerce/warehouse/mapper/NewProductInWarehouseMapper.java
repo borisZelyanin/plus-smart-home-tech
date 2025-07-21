@@ -1,7 +1,7 @@
 package ru.practicum.yandex.commerce.warehouse.mapper;
 
 import org.springframework.stereotype.Component;
-import ru.practicum.yandex.commerce.interfaceapi.dto.warehose.NewProductInWarehouseRequest;
+import ru.practicum.yandex.commerce.delivery.interfaceapi.dto.warehose.NewProductInWarehouseRequest;
 import ru.practicum.yandex.commerce.warehouse.model.WarehouseProduct;
 
 @Component

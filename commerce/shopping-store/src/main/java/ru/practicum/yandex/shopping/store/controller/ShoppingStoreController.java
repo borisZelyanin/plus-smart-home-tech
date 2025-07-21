@@ -8,9 +8,9 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.yandex.commerce.interfaceapi.dto.shopping.store.ProductCategory;
-import ru.practicum.yandex.commerce.interfaceapi.dto.shopping.store.ProductDto;
-import ru.practicum.yandex.commerce.interfaceapi.dto.shopping.store.QuantityState;
+import ru.practicum.yandex.commerce.delivery.interfaceapi.dto.shopping.store.ProductCategory;
+import ru.practicum.yandex.commerce.delivery.interfaceapi.dto.shopping.store.ProductDto;
+import ru.practicum.yandex.commerce.delivery.interfaceapi.dto.shopping.store.QuantityState;
 import ru.practicum.yandex.shopping.store.service.ShoppingStoreService;
 
 import java.util.UUID;

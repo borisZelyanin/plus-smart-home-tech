@@ -3,11 +3,11 @@ package ru.practicum.yandex.commerce.warehouse.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.yandex.commerce.interfaceapi.dto.warehose.NewProductInWarehouseRequest;
-import ru.practicum.yandex.commerce.interfaceapi.dto.warehose.WarehouseAddressDto;
-import ru.practicum.yandex.commerce.interfaceapi.dto.warehose.WarehouseStockDto;
-import ru.practicum.yandex.commerce.interfaceapi.exception.warehouse.ProductNotFoundException;
-import ru.practicum.yandex.commerce.interfaceapi.exception.warehouse.SpecifiedProductAlreadyInWarehouseException;
+import ru.practicum.yandex.commerce.delivery.interfaceapi.dto.warehose.NewProductInWarehouseRequest;
+import ru.practicum.yandex.commerce.delivery.interfaceapi.dto.warehose.WarehouseAddressDto;
+import ru.practicum.yandex.commerce.delivery.interfaceapi.dto.warehose.WarehouseStockDto;
+import ru.practicum.yandex.commerce.delivery.interfaceapi.exception.warehouse.ProductNotFoundException;
+import ru.practicum.yandex.commerce.delivery.interfaceapi.exception.warehouse.SpecifiedProductAlreadyInWarehouseException;
 import ru.practicum.yandex.commerce.warehouse.mapper.NewProductInWarehouseMapper;
 import ru.practicum.yandex.commerce.warehouse.mapper.WarehouseStockMapper;
 import ru.practicum.yandex.commerce.warehouse.model.WarehouseProduct;
@@ -17,10 +17,7 @@ import ru.practicum.yandex.commerce.warehouse.repository.WarehouseAddressReposit
 import ru.practicum.yandex.commerce.warehouse.repository.WarehouseStockRepository;
 
 import java.security.SecureRandom;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -29,12 +26,14 @@ public class WarehouseServiceImpl implements WarehouseService {
     private final WarehouseProductRepository productRepository;
     private final WarehouseAddressRepository addressRepository;
     private final NewProductInWarehouseMapper mapper;
-
+    private final WarehouseStockRepository warehouseStockRepository;
+    private final WarehouseStockMapper warehouseStockMapper;
 
     private static final String[] ADDRESSES = new String[]{"ADDRESS_1", "ADDRESS_2"};
     private static final String CURRENT_ADDRESS = ADDRESSES[new SecureRandom().nextInt(2)];
-    private final WarehouseStockRepository warehouseStockRepository;
-    private final WarehouseStockMapper warehouseStockMapper;
+
+    private final Map<UUID, Map<UUID, Long>> orderBookings = new HashMap<>();
+    private final Map<UUID, UUID> orderToDeliveryMap = new HashMap<>();
 
     @Override
     public boolean isProductInStock(UUID productId) {
@@ -59,7 +58,6 @@ public class WarehouseServiceImpl implements WarehouseService {
         WarehouseStock stock = warehouseStockRepository.findByProduct_ProductId(productId).orElse(null);
 
         if (stock == null) {
-            // Проверка: есть ли такой продукт
             WarehouseProduct product = productRepository.findById(productId)
                     .orElseThrow(() -> new ProductNotFoundException("Продукт не найден: " + productId));
             WarehouseStock newStock = new WarehouseStock();
@@ -94,8 +92,6 @@ public class WarehouseServiceImpl implements WarehouseService {
         }
 
         WarehouseProduct product = mapper.toProduct(request);
-
-
         productRepository.save(product);
     }
 
@@ -125,5 +121,44 @@ public class WarehouseServiceImpl implements WarehouseService {
                 CURRENT_ADDRESS,
                 CURRENT_ADDRESS
         );
+    }
+
+    @Override
+    public void assembleOrder(UUID orderId) {
+        // Примерная реализация: резервируем 1 шт каждого товара
+        Map<UUID, Long> booking = new HashMap<>();
+        List<WarehouseStock> allStock = warehouseStockRepository.findAll();
+
+        for (WarehouseStock stock : allStock) {
+            if (stock.getQuantity() > 0) {
+                stock.setQuantity(stock.getQuantity() - 1);
+                warehouseStockRepository.save(stock);
+                booking.put(stock.getProductId(), 1L);
+            }
+        }
+        orderBookings.put(orderId, booking);
+    }
+
+    @Override
+    public void sendToDelivery(UUID orderId) {
+        UUID deliveryId = UUID.randomUUID();
+        orderToDeliveryMap.put(orderId, deliveryId);
+    }
+
+    @Override
+    public void returnOrder(UUID orderId) {
+        Map<UUID, Long> booking = orderBookings.getOrDefault(orderId, new HashMap<>());
+
+        for (Map.Entry<UUID, Long> entry : booking.entrySet()) {
+            UUID productId = entry.getKey();
+            Long quantity = entry.getValue();
+
+            warehouseStockRepository.findByProduct_ProductId(productId).ifPresent(stock -> {
+                stock.setQuantity(stock.getQuantity() + quantity);
+                warehouseStockRepository.save(stock);
+            });
+        }
+        orderBookings.remove(orderId);
+        orderToDeliveryMap.remove(orderId);
     }
 }

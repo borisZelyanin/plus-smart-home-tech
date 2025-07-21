@@ -3,9 +3,9 @@ package ru.practicum.yandex.commerce.warehouse.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.yandex.commerce.interfaceapi.dto.warehose.NewProductInWarehouseRequest;
-import ru.practicum.yandex.commerce.interfaceapi.dto.warehose.WarehouseAddressDto;
-import ru.practicum.yandex.commerce.interfaceapi.dto.warehose.WarehouseStockDto;
+import ru.practicum.yandex.commerce.delivery.interfaceapi.dto.warehose.NewProductInWarehouseRequest;
+import ru.practicum.yandex.commerce.delivery.interfaceapi.dto.warehose.WarehouseAddressDto;
+import ru.practicum.yandex.commerce.delivery.interfaceapi.dto.warehose.WarehouseStockDto;
 import ru.practicum.yandex.commerce.warehouse.service.WarehouseService;
 
 import java.util.Map;
@@ -40,4 +40,21 @@ public class WarehouseController {
         return ResponseEntity.ok(result);
     }
 
+    @PostMapping("/assemble/{orderId}")
+    public ResponseEntity<Void> assembleOrder(@PathVariable UUID orderId) {
+        service.assembleOrder(orderId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/send-to-delivery/{orderId}")
+    public ResponseEntity<Void> sendToDelivery(@PathVariable UUID orderId) {
+        service.sendToDelivery(orderId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/return/{orderId}")
+    public ResponseEntity<Void> returnOrder(@PathVariable UUID orderId) {
+        service.returnOrder(orderId);
+        return ResponseEntity.ok().build();
+    }
 }

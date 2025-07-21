@@ -1,7 +1,7 @@
 package ru.practicum.yandex.commerce.shopping.cart.mapper;
 
 import org.springframework.stereotype.Component;
-import ru.practicum.yandex.commerce.interfaceapi.dto.shopping.cart.ShoppingCartDto;
+import ru.practicum.yandex.commerce.delivery.interfaceapi.dto.shopping.cart.ShoppingCartDto;
 import ru.practicum.yandex.commerce.shopping.cart.model.ShoppingCart;
 
 import java.util.HashMap;

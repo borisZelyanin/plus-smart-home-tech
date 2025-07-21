@@ -1,7 +1,7 @@
 package ru.practicum.yandex.commerce.shopping.cart.service;
 
-import ru.practicum.yandex.commerce.interfaceapi.dto.warehose.Feign.ChangeProductQuantityRequest;
-import ru.practicum.yandex.commerce.interfaceapi.dto.shopping.cart.ShoppingCartDto;
+import ru.practicum.yandex.commerce.delivery.interfaceapi.dto.warehose.Feign.ChangeProductQuantityRequest;
+import ru.practicum.yandex.commerce.delivery.interfaceapi.dto.shopping.cart.ShoppingCartDto;
 
 import java.util.List;
 import java.util.Map;
