@@ -2,9 +2,9 @@ package ru.practicum.yandex.shopping.store.service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import ru.practicum.yandex.commerce.interfaceapi.dto.shopping.store.ProductCategory;
-import ru.practicum.yandex.commerce.interfaceapi.dto.shopping.store.ProductDto;
-import ru.practicum.yandex.commerce.interfaceapi.dto.shopping.store.QuantityState;
+import ru.practicum.yandex.commerce.delivery.interfaceapi.dto.shopping.store.ProductCategory;
+import ru.practicum.yandex.commerce.delivery.interfaceapi.dto.shopping.store.ProductDto;
+import ru.practicum.yandex.commerce.delivery.interfaceapi.dto.shopping.store.QuantityState;
 
 import java.util.List;
 import java.util.Optional;

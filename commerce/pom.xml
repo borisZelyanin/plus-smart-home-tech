@@ -16,6 +16,9 @@
         <module>interaction-api</module>
         <module>shopping-store</module>
         <module>shopping-cart</module>
+        <module>payment</module>
+        <module>delivery</module>
+        <module>order</module>
     </modules>
 
 
